@@ -1,0 +1,1 @@
+ahoj, používej tuto složku pro vlastní využiti ale finální software který bude nahrán na sumce dávej do "main_sw"
