@@ -1,6 +1,6 @@
 # SUMEC - SOFTWARE
 
-**PARS** - SUMEC is  This project is led and managed by [SPŠ na Proseku](https://www.sps-prosek.cz) students.
+**SUMEC** - is an autonomous MiniSumo robot, that is designed to compete in MiniSumo competitions. MiniSumo robots are small 100mmx100mm autonomous robots that combine electronics, software and mechanics into one project, their task it to push their opponent out of a ring. This project is led and managed by [SPŠ na Proseku](https://www.sps-prosek.cz) students.
 
 ## Table of Contents
 - Description
@@ -12,11 +12,11 @@
 
 
 ## Description
-This GitHub repository contains schematic and PCB files for the main printed circuit board and other electronics carried by PARS.
+This GitHub repository contains software files, functions and main software realeses for SUMEC MiniSumo robot.
 
 ## Contents
-- **PARS_PCB**: Includes schematics and PCB files for the main board, production files such as Gerber plots and BOMs, .step files of the board, and PDF plots.
-- **libs**: Contains needed libraries such as the footprint folder (PARS.pretty), 3D files in .step format, and the symbol library for schematics.
+- **main_sw**: Includes main software that is at the moment used by SUMEC. 
+- **functions**: Contains software for functions, for example sensors, motors etc
 
 ## Contributors
 **PCB Repository Supervisor**:
