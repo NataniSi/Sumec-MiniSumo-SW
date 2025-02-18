@@ -20,14 +20,14 @@ This GitHub repository contains software files, functions and main software real
 
 ## Contributors
 **PCB Repository Supervisor**:
-- **Savva Popov** - Head Hardware Developer and PCB Designer
+- **Natani Šimáčková** - Repository supervisor, head functions developer
 
 **Project Contributors**:
 - **Antonín Havlík** - Head Software Developer
-- **Natani Šimáčková** - Software Developer, Sensorics and Data Acquisition Expert
 - **Šimon Šťastný** - Head Mechanical Designer and Developer
 - **Jonáš Jarý** - Mechanical Developer, Mechanics Expert, Hardware Development Assistant
 - **Lukáš Houdek** - Mechanical Designer and Developer, 3D Printing Expert
+- **Savva Popov** - Head Hardware Developer and PCB Designer
 
 ## Our Suppliers
 We buy our components from:
@@ -39,15 +39,16 @@ We buy our components from:
 ## Contact
 If you have any questions, suggestions, or issues regarding this project, please feel free to contact:
 
-### **Savva Popov** - Head Hardware Developer, Repository Supervisor
-- Email: savva.popov.sp@gmail.com
-- LinkedIn: [Savva Popov](https://www.linkedin.com/in/savva-popov/)
+- **Natani Šimáčková** - Software Developer, Sensorics and Data Acquisition Expert
+  - Email: [SIMACKOVA EMAIL]
 
 ### Other Contacts:
 - **Antonín Havlík** - Head Software Developer 
   - Email: [HAVLIK EMAIL]
-- **Natani Šimáčková** - Software Developer, Sensorics and Data Acquisition Expert
-  - Email: [SIMACKOVA EMAIL]
+
+## **Savva Popov** - Head Hardware Developer
+- Email: savva.popov.sp@gmail.com
+- LinkedIn: [Savva Popov](https://www.linkedin.com/in/savva-popov/)
 - **Šimon Šťastný** - Head Mechanical Designer and Developer
   - Email: simon.ststn@gmail.com
 - **Jonáš Jarý** - Mechanical Developer, Mechanics Expert, Hardware Development Assistant
