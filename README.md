@@ -1,6 +1,6 @@
-# PARS-INSET
+# SUMEC - SOFTWARE
 
-**PARS** - Pipeline Analysis and Recording System, is an automated pipeline deformation scanner. This project is led and managed by [SPŠ na Proseku](https://www.sps-prosek.cz) students and created for [INSET s.r.o.](https://www.inset.com)
+**PARS** - SUMEC is  This project is led and managed by [SPŠ na Proseku](https://www.sps-prosek.cz) students.
 
 ## Table of Contents
 - Description
