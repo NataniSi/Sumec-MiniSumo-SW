@@ -19,13 +19,13 @@ This GitHub repository contains software files, functions and main software real
 - **functions**: Contains software for functions, for example sensors, motors etc
 
 ## Contributors
-**PCB Repository Supervisor**:
+**SOFTWARE Repository Supervisor**:
 - **Natani Šimáčková** - Repository supervisor, head functions developer
 
 **Project Contributors**:
 - **Antonín Havlík** - Head Software Developer
 - **Šimon Šťastný** - Head Mechanical Designer and Developer
-- **Jonáš Jarý** - Mechanical Developer, Mechanics Expert, Hardware Development Assistant
+- **Jonáš Jarý** - Mechanical Developer, Software and Hardware Development Assistant
 - **Lukáš Houdek** - Mechanical Designer and Developer, 3D Printing Expert
 - **Savva Popov** - Head Hardware Developer and PCB Designer
 
@@ -37,21 +37,21 @@ We buy our components from:
 - BotLand
 
 ## Contact
-If you have any questions, suggestions, or issues regarding this project, please feel free to contact:
+If you have any questions, suggestions, or issues regarding this project or repository, please feel free to contact:
 
-- **Natani Šimáčková** - Software Developer, Sensorics and Data Acquisition Expert
+- ### **Natani Šimáčková** - Software Developer, Sensorics and Data Acquisition Expert
   - Email: [SIMACKOVA EMAIL]
 
 ### Other Contacts:
 - **Antonín Havlík** - Head Software Developer 
   - Email: [HAVLIK EMAIL]
 
-## **Savva Popov** - Head Hardware Developer
+**Savva Popov** - Head Hardware Developer
 - Email: savva.popov.sp@gmail.com
 - LinkedIn: [Savva Popov](https://www.linkedin.com/in/savva-popov/)
 - **Šimon Šťastný** - Head Mechanical Designer and Developer
   - Email: simon.ststn@gmail.com
-- **Jonáš Jarý** - Mechanical Developer, Mechanics Expert, Hardware Development Assistant
+- **Jonáš Jarý** - Mechanical Developer, Software and Hardware Development Assistant
   - Email: jary.jonas@gmail.com
 - **Lukáš Houdek** - Mechanical Designer and Developer, 3D Printing Expert
   - Email: [HOUDEK EMAIL]
