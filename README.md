@@ -46,9 +46,9 @@ If you have any questions, suggestions, or issues regarding this project or repo
 - **Antonín Havlík** - Head Software Developer 
   - Email: [HAVLIK EMAIL]
 
-**Savva Popov** - Head Hardware Developer
-- Email: savva.popov.sp@gmail.com
-- LinkedIn: [Savva Popov](https://www.linkedin.com/in/savva-popov/)
+- **Savva Popov** - Head Hardware Developer
+  - Email: savva.popov.sp@gmail.com
+  - LinkedIn: [Savva Popov](https://www.linkedin.com/in/savva-popov/)
 - **Šimon Šťastný** - Head Mechanical Designer and Developer
   - Email: simon.ststn@gmail.com
 - **Jonáš Jarý** - Mechanical Developer, Software and Hardware Development Assistant
