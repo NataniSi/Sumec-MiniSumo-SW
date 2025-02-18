@@ -39,7 +39,7 @@ We buy our components from:
 ## Contact
 If you have any questions, suggestions, or issues regarding this project or repository, please feel free to contact:
 
-- ### **Natani Šimáčková** - Software Developer, Sensorics and Data Acquisition Expert
+- ### **Natani Šimáčková** - Software Developer, Head functions developer
   - Email: [SIMACKOVA EMAIL]
 
 ### Other Contacts:
