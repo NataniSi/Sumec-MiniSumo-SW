@@ -13,15 +13,19 @@
 
 ## Description
 This GitHub repository contains software files, functions and main software realeses for SUMEC MiniSumo robot.
+> [!NOTE]
+> This was written by the head of electrical stuff, it's a bit wrong.
 
 ## Contents
 - **main_sw**: Includes main software that is at the moment used by SUMEC. 
 - **functions**: Contains software for functions, for example sensors, motors etc
+> [!WARNING]
+> This is wrong, but the stuff is still being moved and/or remade from an older repo.
 
 ## Contributors
 **SOFTWARE Repository Supervisor**:
-- **Natani Šimáčková** - Repository supervisor, head functions developer
-
+- **Natani Šimáčková** - Repository supervisor, head of custom io libs
+- 
 **Project Contributors**:
 - **Antonín Havlík** - Head Software Developer
 - **Šimon Šťastný** - Head Mechanical Designer and Developer
@@ -39,8 +43,8 @@ We buy our components from:
 ## Contact
 If you have any questions, suggestions, or issues regarding this project or repository, please feel free to contact:
 
-- ### **Natani Šimáčková** - Software Developer, Head functions developer
-  - Email: [SIMACKOVA EMAIL]
+- ### **Natani Šimáčková** - Software Developer, Head of custom io libs
+  - Email: don't nessage me. maybe try github isssues.
 
 ### Other Contacts:
 - **Antonín Havlík** - Head Software Developer 
