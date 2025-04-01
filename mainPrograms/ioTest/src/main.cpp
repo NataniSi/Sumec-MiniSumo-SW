@@ -18,12 +18,15 @@
 
 
 // What stuff should be tested.
-#define TEST_QRE   1
-#define TEST_SHARP 1
+#define TEST_QRE   0
+#define TEST_SHARP 0
+#define TEST_I2C   1
 
 
 
 // Includes
+#include "Wire.h"
+#include <vector>
 #include "..\..\..\ioPins\ioPins.h"                          // Include pins.
 #include "..\..\..\customLibs\nVMemory\nVMemory\nVMemory.h"  // Include non-volatile memory.
 #if TEST_QRE == 1
@@ -59,8 +62,11 @@ void setup() {
   Serial.begin(115200);
   Serial.print("\e[1;1H");  // Set cursor (row,col), (min 1,1).
   Serial.print("\e[2J");    // Clear console.
+
+  Wire.begin(S_PIN_SDA, S_PIN_SCL, I2C_FREQ);  // I2C.
   // non-volatile memory setup.
   nVMemObj.setup();
+
   // Qre setup.
 #if TEST_QRE == 1
   qreObj.setup(S_PIN_QRE_A, S_PIN_QRE_B, S_PIN_QRE_C, true);
@@ -80,7 +86,7 @@ void loop() {
   char qreLeftChar, qreMidChar, qreRightChar;
 
   if(qreObj.read(qreObj.sensorQre1, &qreLeft) == 1) {  // Set the char to '0' or '1', unless the read fails, then set to '-'.
-    //qreLeftChar = qreLeft + '0';  // Not like this.
+    // qreLeftChar = qreLeft + '0';  // Not like this.
     qreLeftChar = (qreLeft == 0 ? '0' : '1');
   } else {
     qreLeftChar = '-';
@@ -113,30 +119,51 @@ void loop() {
   }
 #endif
 
-  Serial.print("\e[1;1H");                                                                   // Set cursor (row,col), (min 1,1).
-  Serial.printf("Sumec i/o testing pannel: %c", loadingChar[(millis() / 250) % 4]);          // Header text.
+#if TEST_I2C == 1
+  static std::vector<uint8_t> respondingAdresses;
 
-  Serial.print("\e[2;1H");                                                                   //
+  for(uint8_t addr = 0; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    if(Wire.endTransmission() == 0) {
+      respondingAdresses.push_back(addr);
+    }
+  }
+#endif
+
+  Serial.print("\e[1;1H");                                                           // Set cursor (row,col), (min 1,1).
+  Serial.printf("Sumec i/o testing pannel: %c", loadingChar[(millis() / 250) % 4]);  // Header text.
+
+  Serial.print("\e[2;1H");
   Serial.printf("Delta time: %04llu\t fps: %.2f", deltaTimeVar, 1.0 / deltaTimeVar * 1000);  // Time per frame and fps.
 
-  Serial.print("\e[3;1H");                                                                   //
-  Serial.printf("running for %010lums", millis());                                           // Time running.
+  Serial.print("\e[3;1H");
+  Serial.printf("running for %010lums", millis());  // Time running.
 
-  Serial.print("\e[4;1H");                                                                   //
-  Serial.print("Qre: ");                                                                     // Qre stuff
-#if TESR_QRE == 1                                                                            //
-  Serial.printf("(Left|Mid|Right) - (%c|%c|%c)", qreLeftChar, qreMidChar, qreRightChar);     //
-#else                                                                                        //
-  Serial.print("[DISABLED]");  //
+  Serial.print("\e[4;1H");
+  Serial.print("Qre: ");  // Qre stuff
+#if TESR_QRE == 1
+  Serial.printf("(Left|Mid|Right) - (%c|%c|%c)", qreLeftChar, qreMidChar, qreRightChar);
+#else
+  Serial.print("[DISABLED]");
+#endif
 
-#endif                                                                                       //
-  Serial.print("\e[5;1H");                                                                   //
-  Serial.print("Sharp binary: ");                                                            // Sharp binary stuff
-#if TEST_SHARP == 1                                                                          //
-  Serial.printf("(Left|Right) - (%c|%c)", sharpLeftChar, sharpRightChar);                    //
-#else                                                                                        //
-  Serial.print("[DISABLED]");  //
-#endif                                                                                       //
+  Serial.print("\e[5;1H");
+  Serial.print("Sharp binary: ");  // Sharp binary stuff
+#if TEST_SHARP == 1
+  Serial.printf("(Left|Right) - (%c|%c)", sharpLeftChar, sharpRightChar);
+#else
+  Serial.print("[DISABLED]");
+#endif
+
+  Serial.print("\e[6;1H");
+  Serial.printf("I2C addresses:");  // Connected I2C devices.
+#if TEST_I2C == 1
+  for(uint8_t idx = 0; idx < respondingAdresses.size(); idx++) {
+    Serial.printf("\t%x", respondingAdresses.at(idx));
+  }
+#else
+  Serial.print("\t[DISABLED]");
+#endif
 
   delay(20);
 }
