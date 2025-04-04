@@ -15,7 +15,7 @@
 #include <variablesForMAIN.h>
 #include <TfLunaEsp32S3.h>
 #include <Sharp_GP2Y0D810Z0F.h>
-#include "pwmSensor.h"
+#include "pololuPwm.h"
 
 //=================== DECLARING OBJECTs ===================
 
@@ -38,19 +38,12 @@ QRE qreBack('B');
 Sharp sharpLeft('R');
 Sharp sharpRight('L');
 
-// new
-#define pwmSensorPinArrayLen_var 2  // Number of sensors.
-const uint8_t pwmSensorPinArray_var[pwmSensorPinArrayLen_var] = {5, 15};  // Sensor pins (pcb_v.4 left = 5, right = 16).
-uint8_t measuredDistanceArray_var[pwmSensorPinArrayLen_var];  // Array that stores the measured distances.
+// distance senzor
+pwmSensor pwmL(16, 4);
+pwmSensor pwmR(15, 5);
 
-void serialSetCursorPos(uint16_t row, uint16_t col) 
-{
-    Serial.print("\033[");  // Begin of escape sequence.
-    Serial.print(row+1);  // Row number (begins with 1).
-    Serial.print(";");
-    Serial.print(col+1);  // Column (begins with 1).
-    Serial.print("H");
-}
+uint16_t pulseL;
+uint16_t pulseR;
 
 //=================== DECLARING OBJECTs ===================
 
@@ -74,8 +67,9 @@ void setup()
     qreRight.Threshold = 3000;
 
     //new
-    pwmSensor(pwmSensorPinArray_var, pwmSensorPinArrayLen_var, measuredDistanceArray_var);
-}
+    pwmL.pwmSetup();
+    pwmR.pwmSetup();
+}   
 
 void loop()
 {
@@ -96,8 +90,10 @@ void loop()
     QREback = qreBack.get();
 
     // Length senzors
-    //LUNAleft = TfL_Get(TfL_Addr1);
-    //LUNAright = TfL_Get(TfL_Addr3);
+    pwmL.pwmRead(&pulseL);
+    pwmR.pwmRead(&pulseR);
+    LUNAleft = pwmL.pwmToMm(pulseL);
+    LUNAright = pwmR.pwmToMm(pulseR);
     LUNAmiddle = TfL_Get(TfL_Addr2);
 
 
@@ -126,16 +122,14 @@ void loop()
     delay(100);*/
 
     
-
+    Serial.println(LUNAleft);
 
     //Move.goForward(1.0);
 
 
 
     //Serial.println("1st sensor | 2nd sensor");
-    Serial.print(measuredDistanceArray_var[0]);
-    Serial.print(" | ");
-    Serial.println(measuredDistanceArray_var[1]);
+    
     //Serial.print("Millis: ");
     //Serial.println(millis());
     //delay(100);
