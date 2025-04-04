@@ -92,8 +92,8 @@ void Motor::setSpeed(float speed) {
 
 	float s = speed*255;
 
-	ledcWrite(mChannel, s);
-
+	//ledcWrite(mChannel, s);
+	analogWrite(mEnablePin, s);
 }
 
 #endif

@@ -116,10 +116,10 @@ void Motion::turnRight(float speed, float turning) {
     mLMotor.setSpeed(s + d);
 
     if (s - d >= 0) {
-        mRMotor.goForward();
+        mRMotor.goBackward();
         mRMotor.setSpeed(s - d);
     } else {
-        mRMotor.goBackward();
+        mRMotor.goForward();
         mRMotor.setSpeed(d - s);
     }
 
@@ -140,7 +140,7 @@ void Motion::turnLeft(float speed, float turning) {
 
     float d = t*(1.0 - s);
 
-    mRMotor.goForward();
+    mRMotor.goBackward();
     mRMotor.setSpeed(s + d);
 
     if (s - d >= 0) {
@@ -159,7 +159,7 @@ void Motion::goForward(float speed) {
 
     mLMotor.goForward();
     mLMotor.setSpeed(s);
-    mRMotor.goForward();
+    mRMotor.goBackward();
     mRMotor.setSpeed(s);
 
 }
@@ -170,7 +170,7 @@ void Motion::goBackward(float speed) {
 
     mLMotor.goBackward();
     mLMotor.setSpeed(s);
-    mRMotor.goBackward();
+    mRMotor.goForward();
     mRMotor.setSpeed(s);
 
 }

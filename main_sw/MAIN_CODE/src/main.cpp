@@ -37,8 +37,7 @@ QRE qreBack('B');
 Sharp sharpLeft('R');
 Sharp sharpRight('L');
 
-// creating black box
-//Black_box Record;
+
 
 //=================== DECLARING OBJECTs ===================
 
@@ -88,8 +87,8 @@ void loop()
     QREback = qreBack.get();
 
     // Length senzors
-    LUNAleft = TfL_Get(TfL_Addr1);
-    LUNAright = TfL_Get(TfL_Addr3);
+    //LUNAleft;
+    //LUNAright;
     LUNAmiddle = TfL_Get(TfL_Addr2);
 
 
@@ -123,19 +122,6 @@ void loop()
                 Move.stop();
             }
 
-            break;
-        case 1:     //STOP
-            /*
-            Move.stop();
-
-            if((QREleft || QREright))
-            {
-                LINEstate++;
-
-                
-            }
-
-            */
             break;
         case 2:     //Go backward
 
@@ -176,7 +162,9 @@ void loop()
     
 
     //===========================Normal process===============================
-/*  
+/* 
+    *** FOR TESTS IF PROGRAM WORKS ***
+
     Serial.print(LUNAleft);
     Serial.print(" ");
     Serial.print(LUNAmiddle);
