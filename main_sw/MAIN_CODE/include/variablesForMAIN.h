@@ -4,7 +4,7 @@
 //============================= PROGRAM VARIABLES ===============================
 
 // Logic variables:
-#define back_on_line 0          //0 = normal state, 1 = Sumec's back starting on line
+bool back_on_line = 0;          //0 = normal state, 1 = Sumec's back starting on line
 #define Measuring 0   
 
 

@@ -190,8 +190,13 @@ void loop()
     {
     case 000:       // INIT
         
-        if(bootonOld < digitalRead(button)) state = 003;
+        if(bootonOld < digitalRead(button)) //state = 003;
+        {
+            back_on_line = (back_on_line+1)%2;
 
+            if(back_on_line) LEDOrange.setOn();
+            else LEDOrange.setOff();
+        }
         
         if (Remote.hasDohyoID() && !Remote.isStarted())
         {
@@ -244,11 +249,11 @@ void loop()
         {
         case 1:                                                                         //Sumec's left side starting on the line
 
-            if(Tick_Start.tickNumber < 30)
+            if(Tick_Start.tickNumber < 20)
             {
                 Move.turnRight(1.0);
             }
-            else if(Tick_Start.tickNumber < 55)
+            else if(Tick_Start.tickNumber < 45)
             {
                 Move.goForward(1.0);
             }
@@ -260,7 +265,7 @@ void loop()
 
         case 3:                                                                         //Sumec's right side starting on the line
 
-            if(Tick_Start.tickNumber < 25)
+            if(Tick_Start.tickNumber < 20)
             {
                 Move.turnLeft(1.0);
             }
