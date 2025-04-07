@@ -15,6 +15,7 @@
 #include <variablesForMAIN.h>
 #include <TfLunaEsp32S3.h>
 #include <Sharp_GP2Y0D810Z0F.h>
+#include "pololuPwm.h"
 
 //=================== DECLARING OBJECTs ===================
 
@@ -37,6 +38,12 @@ QRE qreBack('B');
 Sharp sharpLeft('R');
 Sharp sharpRight('L');
 
+// distance senzor
+pwmSensor pwmL(16, 4);
+pwmSensor pwmR(5, 5);
+
+uint16_t pulseL;
+uint16_t pulseR;
 
 
 //=================== DECLARING OBJECTs ===================
@@ -56,6 +63,8 @@ void setup()
     pinMode(PIN_Start, INPUT);
     Serial.begin(115200);
     UDP_Setup();
+    pwmL.pwmSetup();
+    pwmR.pwmSetup();
 
     qreLeft.Threshold = 3000;
     qreRight.Threshold = 3000;
@@ -87,8 +96,10 @@ void loop()
     QREback = qreBack.get();
 
     // Length senzors
-    //LUNAleft;
-    //LUNAright;
+    pwmL.pwmRead(&pulseL);
+    pwmR.pwmRead(&pulseR);
+    LUNAleft = round(pwmL.pwmToMm(pulseL)/10);
+    LUNAright = round(pwmR.pwmToMm(pulseR)/10);
     LUNAmiddle = TfL_Get(TfL_Addr2);
 
 
@@ -329,7 +340,7 @@ void loop()
 
     case 230:                                                                           // Turn Right 
 
-        Move.turnRight(0.8);
+        Move.turnRight(0.4);
         //enableSaveing = 1;
         
         if(LUNAleft < Range && LUNAmiddle > Range)
@@ -345,7 +356,7 @@ void loop()
             Tick_free.lastTick = millis();
             Tick_free.tickNumber = 0;
         }
-
+        /*
         if(SHARPleft || SHARPright)
         {
             Tick_Sharp.lastTick = millis();
@@ -361,12 +372,12 @@ void loop()
                 //UDP_SendUdpToAll("state_360", 1);
                 state = 360;
             }
-        }
+        }*/
 
         break;
     case 260:                                                                           // Turn Left
 
-        Move.turnLeft(0.8);
+        Move.turnLeft(0.4);
 
         if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
         {   

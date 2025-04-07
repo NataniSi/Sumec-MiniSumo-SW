@@ -40,7 +40,7 @@ Sharp sharpRight('L');
 
 // distance senzor
 pwmSensor pwmL(16, 4);
-pwmSensor pwmR(15, 5);
+pwmSensor pwmR(5, 5);
 
 uint16_t pulseL;
 uint16_t pulseR;
