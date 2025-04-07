@@ -138,7 +138,7 @@ void loop()
 
             if(Tick_QRE.tickNumber < 10)
             {
-                Move.goBackward(1.0);
+                Move.goBackward(0.5);
             }
             else
             {
@@ -184,6 +184,7 @@ void loop()
     Serial.print("    ");
     Serial.println(state);
 */
+
 
     switch (state)
     {
@@ -340,7 +341,7 @@ void loop()
 
     case 230:                                                                           // Turn Right 
 
-        Move.turnRight(0.4);
+        Move.turnRight(0.3);
         //enableSaveing = 1;
         
         if(LUNAleft < Range && LUNAmiddle > Range)
@@ -372,24 +373,33 @@ void loop()
                 //UDP_SendUdpToAll("state_360", 1);
                 state = 360;
             }
-        }*/
-
+        }
+        */
         break;
     case 260:                                                                           // Turn Left
 
-        Move.turnLeft(0.4);
+        Move.turnLeft(0.3);
 
         if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
         {   
             //UDP_SendUdpToAll("state_230", 1);
             state = 230;
         }
+
+        if(LUNAmiddle < Range)
+        {
+            //UDP_SendUdpToAll("state_290", 1);
+            state = 290;
+
+            Tick_free.lastTick = millis();
+            Tick_free.tickNumber = 0;
+        }
         
         
         break;
     case 290:                                                                           // Go Forward
 
-
+        /*
         if(Tick_free.tickNumber >= 2000)
         {
             if(Tick_free.tickNumber < 2025)
@@ -413,16 +423,16 @@ void loop()
             }
         }
         else
-        {
+        {*/
 
-            if(LUNAmiddle > (Range+5))    
+            if(LUNAmiddle > Range /*&& Tick_free.tickNumber > 10*/)    
             {
                 //UDP_SendUdpToAll("state_230", 1);
                 state = 230;
             }
 
-            Move.goForward(1.0);
-        }
+            Move.goForward(0.7);
+        //}
 
         break;
 
