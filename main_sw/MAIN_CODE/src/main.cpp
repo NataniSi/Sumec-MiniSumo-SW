@@ -174,7 +174,7 @@ void loop()
 
     //===========================Normal process===============================
 /* 
-    *** FOR TESTS IF PROGRAM WORKS ***
+    *** FOR TEST PROGRAM ***
 
     Serial.print(LUNAleft);
     Serial.print(" ");
@@ -184,6 +184,9 @@ void loop()
     Serial.print("    ");
     Serial.println(state);
 */
+Serial.print(SHARPleft);
+Serial.print("    ");
+Serial.println(SHARPright);
 
 
 
