@@ -18,8 +18,8 @@
 
 // side Sharp sensor pins
 
-#define PIN_SHARP_LEFT          35
-#define PIN_SHARP_RIGHT         16
+#define PIN_SHARP_LEFT          16
+#define PIN_SHARP_RIGHT         35
 
 // LED pins
 

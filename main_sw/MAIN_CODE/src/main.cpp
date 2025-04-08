@@ -35,8 +35,8 @@ QRE qreRight('R');
 QRE qreBack('B');
 
 // side sonzors objects
-Sharp sharpLeft('R');
-Sharp sharpRight('L');
+Sharp sharpLeft('L');
+Sharp sharpRight('R');
 
 // distance senzor
 pwmSensor pwmL(16, 4);
@@ -184,6 +184,7 @@ void loop()
     Serial.print("    ");
     Serial.println(state);
 */
+
 
 
     switch (state)
