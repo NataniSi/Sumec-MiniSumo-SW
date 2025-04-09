@@ -173,8 +173,8 @@ void loop()
     
 
     //===========================Normal process===============================
-/* 
-    *** FOR TEST PROGRAM ***
+ 
+    /*** FOR TEST PROGRAM ***/
 
     Serial.print(LUNAleft);
     Serial.print(" ");
@@ -183,10 +183,12 @@ void loop()
     Serial.print(LUNAright);
     Serial.print("    ");
     Serial.println(state);
-*/
+
+/*
 Serial.print(SHARPleft);
 Serial.print("    ");
 Serial.println(SHARPright);
+*/
 
 
 
@@ -345,8 +347,8 @@ Serial.println(SHARPright);
 
     case 230:                                                                           // Turn Right 
 
-        Move.turnRight(0.3);
-        //enableSaveing = 1;
+        Move.turnRight(0.4);
+
         
         if(LUNAleft < Range && LUNAmiddle > Range)
         {
@@ -360,6 +362,13 @@ Serial.println(SHARPright);
 
             Tick_free.lastTick = millis();
             Tick_free.tickNumber = 0;
+        }
+        if(LUNAright < Range)
+        {
+            //UDP_SendUdpToAll("state_290", 1);
+            state = 231;
+
+            
         }
         /*
         if(SHARPleft || SHARPright)
@@ -377,18 +386,40 @@ Serial.println(SHARPright);
                 //UDP_SendUdpToAll("state_360", 1);
                 state = 360;
             }
+        }*/
+        
+        break;
+    case 231:
+
+        Move.turnRight(0.3, 0.2);
+
+        if(LUNAright > Range && (LUNAleft < Range || LUNAmiddle < Range)) 
+        {   
+            //UDP_SendUdpToAll("state_230", 1);
+            state = 230;
         }
-        */
+
+        if(LUNAmiddle < Range)
+        {
+            //UDP_SendUdpToAll("state_290", 1);
+            state = 290;
+
+            Tick_free.lastTick = millis();
+            Tick_free.tickNumber = 0;
+        }
+
         break;
     case 260:                                                                           // Turn Left
 
-        Move.turnLeft(0.3);
+        Move.turnLeft(0.3, 0.2);
 
         if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
         {   
             //UDP_SendUdpToAll("state_230", 1);
             state = 230;
         }
+    
+
 
         if(LUNAmiddle < Range)
         {
@@ -435,7 +466,19 @@ Serial.println(SHARPright);
                 state = 230;
             }
 
-            Move.goForward(0.7);
+            if(LUNAright < Range) 
+            {   
+                //UDP_SendUdpToAll("state_230", 1);
+                state = 231;
+            }
+
+            if(LUNAleft < Range) 
+            {   
+                //UDP_SendUdpToAll("state_230", 1);
+                state = 260;
+            }
+
+            Move.goForward(0.5);
         //}
 
         break;
@@ -445,18 +488,20 @@ Serial.println(SHARPright);
 
     case 330:                                                                           // Turn Right diagonaly and Turn Right 
 
-        if(LUNAmiddle < Range || LUNAleft < Range || LUNAright < Range) state = 230;
+        if(LUNAmiddle < Range ) state = 290;
 
-        Move.turnRight(1.0);
-        
+        Move.turnLeft(0.5);
+        Tick_free.lastTick = millis();
+        Tick_free.tickNumber = 0;       
 
         break;
     case 360:                                                                           // Turn Left diagonaly and Turn Left 
 
-        if(LUNAmiddle < Range || LUNAleft < Range || LUNAright < Range) state = 230;
+        if(LUNAmiddle < Range ) state = 290;
 
-        Move.turnLeft(1.0);
-        
+        Move.turnRight(0.5);
+        Tick_free.lastTick = millis();
+        Tick_free.tickNumber = 0;        
         
         break;
     }    
