@@ -13,7 +13,7 @@
 
 class QRE {
 	private:
-		const uint8_t Sensor_Pin[3] = {7, 6, 3};	// Pins in order: {"left", "right", "rear"}
+		const uint8_t Sensor_Pin[3] = {14, 13, 16};	// Pins in order: {"left", "right", "rear"}
 		uint8_t Sensor;
 		
 	public:

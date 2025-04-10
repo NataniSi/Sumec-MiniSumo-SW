@@ -39,8 +39,8 @@ Sharp sharpLeft('R');
 Sharp sharpRight('L');
 
 // distance senzor
-pwmSensor pwmL(16, 4);
-pwmSensor pwmR(5, 5);
+pwmSensor pwmL(11, 4);
+pwmSensor pwmR(12, 5);
 
 uint16_t pulseL;
 uint16_t pulseR;
@@ -122,7 +122,7 @@ void loop()
     delay(100);*/
 
     
-    Serial.println(LUNAleft);
+    //Serial.println(LUNAleft);
 
     //Move.goForward(1.0);
 
@@ -133,4 +133,9 @@ void loop()
     //Serial.print("Millis: ");
     //Serial.println(millis());
     //delay(100);
+
+
+    Serial.print(QREleft);
+    Serial.print("  ");
+    Serial.print(QREright);
 }
