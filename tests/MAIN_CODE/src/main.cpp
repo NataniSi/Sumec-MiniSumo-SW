@@ -138,4 +138,6 @@ void loop()
     Serial.print(QREleft);
     Serial.print("  ");
     Serial.print(QREright);
+
+    //Move.goForward(1.0);
 }
