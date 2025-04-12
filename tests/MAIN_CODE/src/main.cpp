@@ -77,7 +77,7 @@ void setup()
 
 void loop()
 {
-/*
+
     LEDRed.update();            //updates the red led
     LEDOrange.update();         //updates the orange led
     Remote.update();
@@ -92,17 +92,17 @@ void loop()
     QREleft = qreLeft.get();
     QREright = qreRight.get();
     QREback = qreBack.get();
-*/
-/*
+
+
     // Length senzors
     pwmL.pwmRead(&pulseL);
     pwmR.pwmRead(&pulseR);
     LUNAleft = pwmL.pwmToMm(pulseL);
     LUNAright = pwmR.pwmToMm(pulseR);
-*/  
+  
     LUNAmiddle = TfL_Get(TfL_Addr2);
 
-/*
+
     // side sonzors
     SHARPleft = sharpLeft.get();
     SHARPright = sharpRight.get();
@@ -112,7 +112,7 @@ void loop()
     Tick_managing(Tick_Sharp.tickTime, Tick_Sharp.tickNumber, Tick_Sharp.lastTick, &Tick_Sharp.lastTick, &Tick_Sharp.tickNumber);
     Tick_managing(Tick_Start.tickTime, Tick_Start.tickNumber, Tick_Start.lastTick, &Tick_Start.lastTick, &Tick_Start.tickNumber);
     Tick_managing(Tick_free.tickTime, Tick_free.tickNumber, Tick_free.lastTick, &Tick_free.lastTick, &Tick_free.tickNumber);
-*/
+
 
 
     /*if(Remote.isStarted() && !Remote.isStopped())
@@ -153,7 +153,7 @@ void loop()
     Serial.println(QREright);*/
     //Serial.println("ddd");
     Serial.println(LUNAmiddle);
-    delay(1);
+    //delay(1);
 
 
     //Move.turnRight(1.0);
