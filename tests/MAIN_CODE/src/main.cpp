@@ -60,6 +60,7 @@ void setup()
     TfL_Setup();
     pinMode(button, INPUT);
     pinMode(PIN_Start, INPUT);
+    pinMode(18, OUTPUT);
     Serial.begin(115200);
     UDP_Setup();
 
@@ -69,11 +70,14 @@ void setup()
     //new
     pwmL.pwmSetup();
     pwmR.pwmSetup();
+
+
+    pinMode(6, OUTPUT);
 }   
 
 void loop()
 {
-
+/*
     LEDRed.update();            //updates the red led
     LEDOrange.update();         //updates the orange led
     Remote.update();
@@ -88,15 +92,17 @@ void loop()
     QREleft = qreLeft.get();
     QREright = qreRight.get();
     QREback = qreBack.get();
-
+*/
+/*
     // Length senzors
     pwmL.pwmRead(&pulseL);
     pwmR.pwmRead(&pulseR);
     LUNAleft = pwmL.pwmToMm(pulseL);
     LUNAright = pwmR.pwmToMm(pulseR);
+*/  
     LUNAmiddle = TfL_Get(TfL_Addr2);
 
-
+/*
     // side sonzors
     SHARPleft = sharpLeft.get();
     SHARPright = sharpRight.get();
@@ -106,16 +112,18 @@ void loop()
     Tick_managing(Tick_Sharp.tickTime, Tick_Sharp.tickNumber, Tick_Sharp.lastTick, &Tick_Sharp.lastTick, &Tick_Sharp.tickNumber);
     Tick_managing(Tick_Start.tickTime, Tick_Start.tickNumber, Tick_Start.lastTick, &Tick_Start.lastTick, &Tick_Start.tickNumber);
     Tick_managing(Tick_free.tickTime, Tick_free.tickNumber, Tick_free.lastTick, &Tick_free.lastTick, &Tick_free.tickNumber);
-
+*/
 
 
     /*if(Remote.isStarted() && !Remote.isStopped())
     {
         Move.goForward(1.0);
+        Serial.println("program");
     }
     else if(Remote.hasDohyoID() && !Remote.isStarted())
     {
         Move.stop();
+        Serial.println("start");
     }*/
 
     /*Serial.println(LUNAmiddle);
@@ -134,10 +142,21 @@ void loop()
     //Serial.println(millis());
     //delay(100);
 
+    /*MotorLeft.goBackward();
+    MotorLeft.setSpeed(100);
+    digitalWrite(6, 1);
+    delay(6);*/
 
+    /*
     Serial.print(QREleft);
     Serial.print("  ");
-    Serial.print(QREright);
+    Serial.println(QREright);*/
+    //Serial.println("ddd");
+    Serial.println(LUNAmiddle);
+    delay(1);
 
-    //Move.goForward(1.0);
+
+    //Move.turnRight(1.0);
+    //digitalWrite(6, 1);
+    //delay(100);
 }
