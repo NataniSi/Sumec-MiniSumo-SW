@@ -95,13 +95,14 @@ void loop()
 
 
     // Length senzors
+    /*
     pwmL.pwmRead(&pulseL);
     pwmR.pwmRead(&pulseR);
     LUNAleft = pwmL.pwmToMm(pulseL);
     LUNAright = pwmR.pwmToMm(pulseR);
   
     LUNAmiddle = TfL_Get(TfL_Addr2);
-
+    */
 
     // side sonzors
     SHARPleft = sharpLeft.get();
@@ -115,16 +116,16 @@ void loop()
 
 
 
-    /*if(Remote.isStarted() && !Remote.isStopped())
+    if(Remote.isStarted() && !Remote.isStopped())
     {
         Move.goForward(1.0);
-        Serial.println("program");
+        Serial.println("start");
     }
     else if(Remote.hasDohyoID() && !Remote.isStarted())
     {
         Move.stop();
-        Serial.println("start");
-    }*/
+        Serial.println("PROgram");
+    }
 
     /*Serial.println(LUNAmiddle);
     delay(100);*/
@@ -152,8 +153,8 @@ void loop()
     Serial.print("  ");
     Serial.println(QREright);*/
     //Serial.println("ddd");
-    Serial.println(LUNAmiddle);
-    //delay(1);
+    /*Serial.println(LUNAleft);
+    delay(1);*/
 
 
     //Move.turnRight(1.0);

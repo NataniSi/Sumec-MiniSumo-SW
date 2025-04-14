@@ -61,6 +61,8 @@ void setup()
     TfL_Setup();
     pinMode(button, INPUT);
     pinMode(PIN_Start, INPUT);
+    pinMode(6, OUTPUT);
+    pinMode(18, OUTPUT);
     Serial.begin(115200);
     UDP_Setup();
     pwmL.pwmSetup();
@@ -96,16 +98,17 @@ void loop()
     QREback = qreBack.get();
 
     // Length senzors
+    /*
     pwmL.pwmRead(&pulseL);
     pwmR.pwmRead(&pulseR);
     LUNAleft = round(pwmL.pwmToMm(pulseL)/10);
     LUNAright = round(pwmR.pwmToMm(pulseR)/10);
     LUNAmiddle = TfL_Get(TfL_Addr2);
-
+    */
 
     // side sonzors
-    SHARPleft = sharpLeft.get();
-    SHARPright = sharpRight.get();
+    SHARPright = sharpLeft.get();
+    SHARPleft = sharpRight.get();
 
     // Writeing value to TICK
     Tick_managing(Tick_QRE.tickTime, Tick_QRE.tickNumber, Tick_QRE.lastTick, &Tick_QRE.lastTick, &Tick_QRE.tickNumber);
@@ -150,19 +153,19 @@ void loop()
 
             Move.stop();
 
-            state = saveState;
-            LINEstate = 0;
+            LINEstate = 4;
 
             break;
         case 4:     //Go forward    -   I dont know, what it doing -> delete this
 
-            if(Tick_QRE.tickNumber < 10)
+            if(Tick_QRE.tickNumber < 15)
             {
-                Move.goForward(1.0);
+                Move.turnLeft(1.0);
             }
             else
             {
-                LINEstate = 3;
+                LINEstate = 0;
+                state = saveState;
             }
 
             //UDP_SendUdpToAll("QRE_END", 1);
@@ -176,13 +179,13 @@ void loop()
  
     /*** FOR TEST PROGRAM ***/
 
-    Serial.print(LUNAleft);
+    /*Serial.print(LUNAleft);
     Serial.print(" ");
     Serial.print(LUNAmiddle);
     Serial.print(" ");
     Serial.print(LUNAright);
     Serial.print("    ");
-    Serial.println(state);
+    Serial.println(state);*/
 
 /*
 Serial.print(SHARPleft);
@@ -305,6 +308,8 @@ Serial.println(SHARPright);
 
         default:                                                                         //Sumec starting inside the ring
 
+            Move.turnRight(0.7);
+            delay(300);
             state = tipe_of_strategy;   
             break;
         }      
@@ -347,10 +352,10 @@ Serial.println(SHARPright);
 
     case 230:                                                                           // Turn Right 
 
-        Move.turnRight(0.4);
-
+        Move.goForward(0.3);
+        //digitalWrite(6, 1);
         
-        if(LUNAleft < Range && LUNAmiddle > Range)
+        /*if(LUNAleft < Range && LUNAmiddle > Range)
         {
             //UDP_SendUdpToAll("state_260", 1);
             state = 260;
@@ -369,8 +374,8 @@ Serial.println(SHARPright);
             state = 231;
 
             
-        }
-        /*
+        }*/
+        
         if(SHARPleft || SHARPright)
         {
             Tick_Sharp.lastTick = millis();
@@ -386,7 +391,7 @@ Serial.println(SHARPright);
                 //UDP_SendUdpToAll("state_360", 1);
                 state = 360;
             }
-        }*/
+        }
         
         break;
     case 231:
@@ -488,18 +493,18 @@ Serial.println(SHARPright);
 
     case 330:                                                                           // Turn Right diagonaly and Turn Right 
 
-        if(LUNAmiddle < Range ) state = 290;
+        if(!SHARPleft) state = 230;
 
-        Move.turnLeft(0.5);
+        Move.turnRight(0.2, 0.1);
         Tick_free.lastTick = millis();
         Tick_free.tickNumber = 0;       
 
         break;
     case 360:                                                                           // Turn Left diagonaly and Turn Left 
 
-        if(LUNAmiddle < Range ) state = 290;
+        if(!SHARPright) state = 230;
 
-        Move.turnRight(0.5);
+        Move.turnLeft(0.2, 0.2);
         Tick_free.lastTick = millis();
         Tick_free.tickNumber = 0;        
         

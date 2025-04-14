@@ -28,7 +28,7 @@
 
 // IR sensor pin
 
-#define PIN_IR                  35
+#define PIN_IR                  37
 #define PIN_Start               35  //must be edited               
 // BUTTON   
 

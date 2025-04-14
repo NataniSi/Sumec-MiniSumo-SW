@@ -10,7 +10,7 @@
 
 class Sharp {
 	private:
-		const uint8_t Sensor_Pin[2] = {8, 4};	// Pins in order: {"left", "right"}
+		const uint8_t Sensor_Pin[2] = {10, 38};	// Pins in order: {"left", "right"}
 		uint8_t Sensor;
 		
 	public:
