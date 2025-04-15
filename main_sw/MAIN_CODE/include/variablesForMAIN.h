@@ -3,14 +3,14 @@
 
 //============================= PROGRAM VARIABLES ===============================
 
+#define Range 40                 // Length senzor range[cm] for decision, is enybodey there?
+#define Type_of_starting 0       // 0 = IR led, 1 = IR modul
+
 // Logic variables:
 bool back_on_line = 0;          //0 = normal state, 1 = Sumec's back starting on line
-#define Measuring 0   
 
 
-int Range = 40;                 // Length senzor range[cm] for decision, is enybodey there?
-
-
+//States
 int tipe_of_strategy = 230;
 uint16_t state = 0;             // variable who decides, what is in progress
 uint16_t LINEstate = 0;
@@ -19,9 +19,6 @@ uint16_t saveState;
 
 float rotate_coeficient = 0;    // wariable for rotating, how much is having rotating 
 bool isStarted = 0;             // variable for starting with button
-bool sharpON_OFF = 1;           // rafinering parameter for side sonzors, Is side sonzor on or off
-bool lunaON_OFF = 1;            // rafinering parameter for Length senzor, Is Length senzor on or off
-bool QRE_left_started = 0;
 int START = 0; 
 
 

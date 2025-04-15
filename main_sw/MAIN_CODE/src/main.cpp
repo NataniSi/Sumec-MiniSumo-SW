@@ -124,19 +124,6 @@ void loop()
             }
 
             break;
-        case 1:     //STOP
-            /*
-            Move.stop();
-
-            if((QREleft || QREright))
-            {
-                LINEstate++;
-
-                
-            }
-
-            */
-            break;
         case 2:     //Go backward
 
             if(Tick_QRE.tickNumber < 10)
