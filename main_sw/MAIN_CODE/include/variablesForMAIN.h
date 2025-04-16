@@ -3,21 +3,23 @@
 
 //============================= PROGRAM VARIABLES ===============================
 
-#define Range 40                 // Length senzor range[cm] for decision, is enybodey there?
+#define Range 60                 // Length senzor range[cm] for decision, is enybodey there?
 #define Type_of_starting 0       // 0 = IR led, 1 = IR modul
+#define tests 0                  // tests: 0 = off, 1 = on
+#define Searching_rotate 0.25
 
 // Logic variables:
 bool back_on_line = 0;          //0 = normal state, 1 = Sumec's back starting on line
 
 
-//States
-int tipe_of_strategy = 230;
+// States
+int tipe_of_strategy = 290;
 uint16_t state = 0;             // variable who decides, what is in progress
 uint16_t LINEstate = 0;
 uint8_t startState;
 uint16_t saveState;
 
-float rotate_coeficient = 0;    // wariable for rotating, how much is having rotating 
+// Start variables
 bool isStarted = 0;             // variable for starting with button
 int START = 0; 
 
@@ -74,10 +76,7 @@ TICK Tick_Start;
 TICK Tick_free;
 
 
-
-
-
-// calibrator
+// Function for calibration
 
 float A = 0;
 float B = 0;

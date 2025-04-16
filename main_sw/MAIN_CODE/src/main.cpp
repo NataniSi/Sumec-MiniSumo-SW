@@ -37,8 +37,7 @@ QRE qreBack('B');
 Sharp sharpLeft('R');
 Sharp sharpRight('L');
 
-// creating black box
-//Black_box Record;
+
 
 //=================== DECLARING OBJECTs ===================
 
@@ -56,7 +55,7 @@ void setup()
     pinMode(button, INPUT);
     pinMode(PIN_Start, INPUT);
     Serial.begin(115200);
-    UDP_Setup();
+
 
     qreLeft.Threshold = 3000;
     qreRight.Threshold = 3000;
@@ -109,11 +108,11 @@ void loop()
 
     switch (LINEstate)
     {
-        case 0:     //QRE
+        //QRE
+        case 0:     
 
             if((QREleft || QREright) && state != 0 && state != 2 && state != 3)
             {
-                //UDP_SendUdpToAll("QRE", 1);
                 saveState = state;   //saved last state
                 state = 001;
                 LINEstate = LINEstate+2;
@@ -124,7 +123,9 @@ void loop()
             }
 
             break;
-        case 2:     //Go backward
+
+        //Go backward
+        case 2:     
 
             if(Tick_QRE.tickNumber < 10)
             {
@@ -136,7 +137,9 @@ void loop()
             }
 
             break;
-        case 3:     //STOP after backward
+
+        //STOP after backward
+        case 3:     
 
             Move.stop();
 
@@ -144,7 +147,9 @@ void loop()
             LINEstate = 0;
 
             break;
-        case 4:     //Go forward    -   I dont know, what it doing -> delete this
+
+        //Go forward    -   I dont know, what it doing -> delete this
+        case 4:     
 
             if(Tick_QRE.tickNumber < 10)
             {
@@ -155,7 +160,6 @@ void loop()
                 LINEstate = 3;
             }
 
-            //UDP_SendUdpToAll("QRE_END", 1);
             break;
 
     }
@@ -163,15 +167,23 @@ void loop()
     
 
     //===========================Normal process===============================
-/*  
-    Serial.print(LUNAleft);
-    Serial.print(" ");
-    Serial.print(LUNAmiddle);
-    Serial.print(" ");
-    Serial.print(LUNAright);
-    Serial.print("    ");
-    Serial.println(state);
-*/
+
+    // printing values from senzors to chack, is it ok
+    if(tests)
+    {    
+        Serial.print(LUNAleft);
+        Serial.print(" ");
+        Serial.print(LUNAmiddle);
+        Serial.print(" ");
+        Serial.print(LUNAright);
+        Serial.print("    ");
+        Serial.print(QREright);
+        Serial.print(" ");
+        Serial.println(qreBack.getRaw());
+        Serial.print("    ");
+        Serial.print(state);
+    }
+
 
     switch (state)
     {
@@ -185,6 +197,7 @@ void loop()
             else LEDOrange.setOff();
         }
         
+        //===========================Checking IR state===============================
         if (Remote.hasDohyoID() && !Remote.isStarted())
         {
             LEDRed.blink(500, 100);
@@ -199,11 +212,9 @@ void loop()
         // after start comand, main code will start running
         if (Remote.isStarted())
         {
-            //UDP_SendUdpToAll("======================", 1);
             state = 002;
             Tick_Start.tickNumber = 0;
             LINEstate = 0;
-            //UDP_SendUdpToAll("Start", 1);
         }
 
         LINEstate = 0;
@@ -215,26 +226,30 @@ void loop()
 
         break;
 
-    /*=============BEGIN OF START FUNCTION=============*/
+    /*=============START FUNCTION=============*/
 
     case 002:
 
-        //UDP_SendUdpToAll("state_002->Start_function", 1);
-        LINEstate = 0;                                                                  //Out of line disabled
+        //Out of line disabled
+        LINEstate = 0;                                                                  
 
-        if(back_on_line)                                                                //protect in back on line start
+        //protect in back on line start
+        if(back_on_line)                                                                
         {
             QREleft = 0;
             QREright = 0;
         }
 
-        if(startState == 0) startState = QREleft*1 + QREright*3 + back_on_line*5;       //setting startState only in one time
+        //setting startState only in one time
+        if(startState == 0) startState = QREleft*1 + QREright*3 + back_on_line*5;       
         
 
 
         switch (startState)
         {
-        case 1:                                                                         //Sumec's left side starting on the line
+
+        //Sumec's left side starting on the line
+        case 1:                                                                         
 
             if(Tick_Start.tickNumber < 20)
             {
@@ -250,7 +265,8 @@ void loop()
             }
             break;
 
-        case 3:                                                                         //Sumec's right side starting on the line
+        //Sumec's right side starting on the line
+        case 3:                                                                        
 
             if(Tick_Start.tickNumber < 20)
             {
@@ -266,7 +282,8 @@ void loop()
             }
             break;
 
-        case 5:                                                                         //Sumec's back side starting on the line
+        //Sumec's back side starting on the line
+        case 5:                                                                         
 
             if(Tick_Start.tickNumber < 40)
             {
@@ -278,7 +295,8 @@ void loop()
             }
             break;
 
-        case 4:                                                                         //Sumec's front side starting on the line
+        //Sumec's front side starting on the line
+        case 4:                                                                         
 
             if(Tick_Start.tickNumber < 20)
             {
@@ -289,13 +307,16 @@ void loop()
                 state = tipe_of_strategy;
             }
 
-        default:                                                                         //Sumec starting inside the ring
+        //Sumec starting inside the ring
+        default:                                                                         
 
             state = tipe_of_strategy;   
+
             break;
         }      
         break;
 
+    /*=============CALIBRATION STATE=============*/
     case 003:
  
         LINEstate = 0;
@@ -329,27 +350,30 @@ void loop()
         }
         break;
 
-    /*=============END OF START FUNCTION=============*/
+    case 230:                                                                           
 
-    case 230:                                                                           // Turn Right 
+        // Searching with smoller speed
+        if(LUNAright > Range) Move.turnRight(0.8*Searching_rotate);
 
-        Move.turnRight(0.8);
-        //enableSaveing = 1;
+        // Make movement
+        else Move.turnRight(0.8);
         
+        // Chacking left senzor
         if(LUNAleft < Range && LUNAmiddle > Range)
         {
-            //UDP_SendUdpToAll("state_260", 1);
             state = 260;
         }
+
+        // Chacking middle senzor
         if(LUNAmiddle < Range)
         {
-            //UDP_SendUdpToAll("state_290", 1);
             state = 290;
 
             Tick_free.lastTick = millis();
             Tick_free.tickNumber = 0;
         }
 
+        // Chacking sides senzor
         if(SHARPleft || SHARPright)
         {
             Tick_Sharp.lastTick = millis();
@@ -357,72 +381,73 @@ void loop()
 
             if(SHARPleft)
             {
-                //UDP_SendUdpToAll("state_330", 1);
                 state = 330;
             }
             else if(SHARPright)
             {
-                //UDP_SendUdpToAll("state_360", 1);
                 state = 360;
             }
         }
 
         break;
-    case 260:                                                                           // Turn Left
+    case 260:                                                                           
 
+        // Make movement
         Move.turnLeft(0.8);
 
+        //Return to the searching mode, if left senzor see nothing, or middle or right senzors see something
         if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
         {   
-            //UDP_SendUdpToAll("state_230", 1);
             state = 230;
         }
         
         
         break;
-    case 290:                                                                           // Go Forward
+    case 290:                                                                           
 
+        // Make movement
+        Move.goForward(1.0);
 
+        // twitching after 2s
         if(Tick_free.tickNumber >= 2000)
         {
             if(Tick_free.tickNumber < 2025)
             {
                 Move.turnRight(1.0);
             }
-            else if(Tick_free.tickNumber < 2050)
+            else if(Tick_free.tickNumber < 2075)
             {
                 Move.turnLeft(1.0);
             }
             else
             {
 
-                if(LUNAmiddle > (Range+5))    
+                if(LUNAmiddle > Range)    
                 {
-                    //UDP_SendUdpToAll("state_230", 1);
                     state = 230;
                 }
 
                 Tick_free.tickNumber = 2000;
             }
         }
+
+        // Return to the searching mode, if middle senzor see nothing
         else
         {
 
-            if(LUNAmiddle > (Range+5))    
+            if(LUNAmiddle > Range)    
             {
-                //UDP_SendUdpToAll("state_230", 1);
                 state = 230;
             }
 
-            Move.goForward(1.0);
         }
 
         break;
 
 
-    /*=============Sharps=============*/
+    /*=============Sharps -> Emergenci mode=============*/
 
-    case 330:                                                                           // Turn Right diagonaly and Turn Right 
+    case 330:                                                                            
 
         if(LUNAmiddle < Range || LUNAleft < Range || LUNAright < Range) state = 230;
 
@@ -430,7 +455,7 @@ void loop()
         
 
         break;
-    case 360:                                                                           // Turn Left diagonaly and Turn Left 
+    case 360:                                                                           
 
         if(LUNAmiddle < Range || LUNAleft < Range || LUNAright < Range) state = 230;
 
