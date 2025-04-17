@@ -1,3 +1,5 @@
+
+#if 1
 /**
  * https://www.instructables.com/ATTiny-Port-Manipulation/
  * https://www.instructables.com/ATtiny85-Interrupt-Barebones-Example/
@@ -9,45 +11,46 @@
  * Hope it works.
  */
 
-#include <Arduino.h>
+  #include <Arduino.h>
 
 
-#define PIN_STATE_OUT 3
-#define PIN_IR_INPUT  4
-#define PIN_LED1      1
-#define PIN_LED2      0
+  #define PIN_STATE_OUT 3
+  #define PIN_IR_INPUT  4
+  #define PIN_LED1      1
+  #define PIN_LED2      0
 
-#define RECIEVE_TIMEOUT 3    // In ms. How long since the last trigger should be considered an end.
-#define BIT_MIN_TIME    750  // In us. Anything shorter than this is noise.
-
-
-#define PROTOCOL_RC5    1
-#define RC5_SINGLE_LOW  800
-#define RC5_SINGLE_HIGH 1000
-#define RC5_DOUBLE_LOW  1600
-#define RC5_DOUBLE_HIGH 2000
+  #define RECIEVE_TIMEOUT 3    // In ms. How long since the last trigger should be considered an end.
+  #define BIT_MIN_TIME    750  // In us. Anything shorter than this is noise.
+  #define BUFFER_SIZE     32
 
 
-#define SET_TO_BIT(BIT, OUT_ARRAY_INDEX, OUT_ARRAY)                                                                            \
-  if(BIT == 0) {                                                                                                               \
-    OUT_ARRAY &= 1 << OUT_ARRAY_INDEX;                                                                                         \
-  } else {                                                                                                                     \
-    OUT_ARRAY |= 0 << OUT_ARRAY_INDEX;                                                                                         \
-  }
+  #define PROTOCOL_RC5    1
+  #define RC5_SINGLE_LOW  800
+  #define RC5_SINGLE_HIGH 1000
+  #define RC5_DOUBLE_LOW  1600
+  #define RC5_DOUBLE_HIGH 2000
 
-#define DIV_TWO_CEIL(SRC, DST)                                                                                                 \
-  if(SRC & 1 == 1) {                                                                                                           \
-    DST = SRC >> 1;                                                                                                            \
-    DST = SRC + 1;                                                                                                             \
-  } else {                                                                                                                     \
-    DST = SRC >> 1;                                                                                                            \
-  }
+
+  #define SET_TO_BIT(BIT, OUT_ARRAY_INDEX, OUT_ARRAY)                                                                          \
+    if((BIT) == 0) {                                                                                                           \
+      OUT_ARRAY &= 1 << OUT_ARRAY_INDEX;                                                                                       \
+    } else {                                                                                                                   \
+      OUT_ARRAY |= 0 << OUT_ARRAY_INDEX;                                                                                       \
+    }
+
+  #define DIV_TWO_CEIL(SRC, DST)                                                                                               \
+    if((SRC & 1) == 1) {                                                                                                       \
+      DST = SRC >> 1;                                                                                                          \
+      DST = SRC + 1;                                                                                                           \
+    } else {                                                                                                                   \
+      DST = SRC >> 1;                                                                                                          \
+    }
 
 
 
 uint64_t             rawBuffer                    = 0;
-static const uint8_t rawBufferSize                = sizeof(rawBuffer) * 8;
-uint32_t             rawBufferTime[rawBufferSize] = {0};
+static const uint8_t rawBufferSize                = (BUFFER_SIZE < sizeof(rawBuffer) * 8 ? BUFFER_SIZE : sizeof(rawBuffer) * 8);
+uint16_t             rawBufferTime[rawBufferSize] = {0};
 uint8_t              rawBufferIndex               = 0;
 uint32_t             recieveTimeoutTime           = -1;
 
@@ -81,9 +84,9 @@ void irInterrupt() {
 }
 
 
-uint64_t             cleanBuffer                      = 0;
-static const uint8_t cleanBufferSize                  = sizeof(cleanBuffer) * 8;
-uint32_t             cleanBufferTime[cleanBufferSize] = {0};
+uint64_t             cleanBuffer     = 0;
+static const uint8_t cleanBufferSize = (BUFFER_SIZE < sizeof(cleanBuffer) * 8 ? BUFFER_SIZE : sizeof(cleanBuffer) * 8);
+uint16_t             cleanBufferTime[cleanBufferSize] = {0};
 uint8_t              cleanBufferIndex                 = 0;
 
 void reduceBuffer() {
@@ -157,11 +160,11 @@ bool decodeRc5(uint8_t*       toggle,
                uint8_t*       address,
                uint8_t*       command,
                const uint64_t buffer,
-               uint32_t*      bufferTime,
+               uint16_t*      bufferTime,
                const uint8_t  bufferSize) {
-  for(uint8_t idx = 0; idx < bufferSize; idx++) {  // DEBUG
+  /*for(uint8_t idx = 0; idx < bufferSize; idx++) {  // DEBUG
     Serial.printf("%02x\t%u\t%lu\n", idx, (buffer >> idx) & 1, bufferTime[idx]);
-  }
+  }*/
 
   uint64_t decodedBits      = 0;
   uint8_t  decodedBitsIndex = 0;  // 26 or 27
@@ -235,7 +238,7 @@ private:
   uint16_t durationHigh = 0;
   uint16_t durationLow  = 0;
   uint8_t  repeats      = 0;
-  uint32_t timeStart     = 0;
+  uint32_t timeStart    = 0;
   uint32_t timeEnd      = 0;
 
 public:
@@ -248,7 +251,7 @@ public:
     this->durationHigh = durationHigh;
     this->durationLow  = durationLow;
     this->repeats      = repeats;
-    timeStart           = millis();
+    timeStart          = millis();
     timeEnd            = timeStart + ((durationHigh + durationLow) * repeats);
   }
 
@@ -276,7 +279,7 @@ public:
       return 0;
     }
   }
-}
+};
 
 
 
@@ -284,12 +287,14 @@ led led1Obj(PIN_LED1);
 led led2Obj(PIN_LED2);
 
 
-void setup() {
+void           setup() {
   delay(2000);           // DEBUG
   Serial.begin(115200);  // DEBUG
   delay(2000);           // DEBUG
+  Serial.println("BEGIN"); // DEBUG
   pinMode(PIN_IR_INPUT, INPUT);
   pinMode(PIN_STATE_OUT, OUTPUT);
+  digitalWrite(PIN_STATE_OUT, 0);
   attachInterrupt(PIN_IR_INPUT, irInterrupt, CHANGE);
   /*
   DDRB |= 1 << PIN_STATE_OUT;  // Set 3 as output.
@@ -310,41 +315,41 @@ void loop() {
 
   // Check for ir.
   if(irCheck(&recievedToggle, &recievedAddress, &recievedCommand)) {
-    Serial.printf("tgl: %u\naddr: 0x%x\tcmd: 0x%x\n", recievedToggle, recievedAddress, recievedCommand);  // DEBUG
+    //Serial.printf("tgl: %u\naddr: 0x%x\tcmd: 0x%x\n", recievedToggle, recievedAddress, recievedCommand);  // DEBUG
     /** TODO: do something with these */
     // Detect only change.
     if(recievedToggle != recievedTogglePrev && recievedAddress != recievedAddressPrev &&
        recievedCommand != recievedCommandPrev) {
-      recievedTogglePrev  = recievedToggle;
-      recievedAddressPrev = recievedAddress;
-      recievedCommandPrev = recievedCommand;
-      changeState         = 1;
-    }
-  } else {
-    Serial.println("ReadErr");  // DEBUG
-  }
-
-  static uint8_t state = 0, statePrev = -1;
-#define STATE_WAITING 0
-#define STATE_RUNNING 1
-#define STATE_STOPPED 2
-  switch(state) {
-    case STATE_WAITING:
-      if(changeState == 1) {
-        // On enter.
-        if(state != statePrev) {
-          statePrev = state;
+         recievedTogglePrev  = recievedToggle;
+         recievedAddressPrev = recievedAddress;
+         recievedCommandPrev = recievedCommand;
+         changeState         = 1;
         }
+      } else {
+        //Serial.println("ReadErr");  // DEBUG
       }
-      break;
-
-    case STATE_RUNNING:
-      if(changeState == 1) {
-      }
-      break;
-
-    case STATE_STOPPED:
-      if(changeState == 1) {
+      
+      static uint8_t state = 0, statePrev = -1;
+      #define STATE_WAITING 0
+      #define STATE_RUNNING 1
+      #define STATE_STOPPED 2
+      switch(state) {
+        case STATE_WAITING:
+        if(changeState == 1) {
+          // On enter.
+          if(state != statePrev) {
+            statePrev = state;
+          }
+        }
+        break;
+        
+        case STATE_RUNNING:
+        if(changeState == 1) {
+        }
+        break;
+        
+        case STATE_STOPPED:
+        if(changeState == 1) {
       }
       break;
 
@@ -353,6 +358,24 @@ void loop() {
       break;
   }
 
-
+  Serial.print("ALIVE: ");
+  Serial.println(millis());
   delay(50);
 }
+#else
+
+  #include <Arduino.h>
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(3, OUTPUT);
+}
+
+void loop() {
+  Serial.println("Hewwo wowd :3");
+  digitalWrite(3, 1);
+  delay(500);
+  digitalWrite(3, 0);
+  delay(500);
+}
+#endif
