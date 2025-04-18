@@ -1,1 +1,0 @@
-ur own folder for testing, work and stuff, you are free to change anything as you have the rights (i think?), but software realeses MUST be uploaded to a different folder, thamks >w< :3
