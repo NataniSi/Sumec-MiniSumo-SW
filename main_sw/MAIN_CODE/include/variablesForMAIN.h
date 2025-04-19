@@ -7,6 +7,7 @@
 #define Type_of_starting 0       // 0 = IR led, 1 = IR modul
 #define tests 0                  // tests: 0 = off, 1 = on
 #define Searching_rotate 0.25
+#define AnotherStarting 0
 
 // Logic variables:
 bool back_on_line = 0;          //0 = normal state, 1 = Sumec's back starting on line
