@@ -183,7 +183,7 @@ void loop()
         Serial.print("    ");
         Serial.print(state);
     }
-
+    Serial.println(starting_direction);
 
     switch (state)
     {
@@ -207,6 +207,9 @@ void loop()
         } else
         {
             LEDRed.blink(500);
+
+            if(SHARPleft) starting_direction = 0;
+            if(SHARPright) starting_direction = 1;
         }
 
         // after start comand, main code will start running
@@ -309,8 +312,19 @@ void loop()
 
         //Sumec starting inside the ring
         default:                                                                         
+            
+            if(starting_direction == 1){
 
-            state = tipe_of_strategy;   
+                Move.turnLeft(1.0);
+                Serial.println("left");
+                
+            } else{
+
+                Move.turnRight(1.0);
+                Serial.println("right");
+            }
+
+            if(LUNAleft < Range || LUNAright < Range) state = tipe_of_strategy;
 
             break;
         }      
@@ -354,7 +368,6 @@ void loop()
 
         // Searching with smoller speed
         if(LUNAright > Range) Move.turnRight(0.8*Searching_rotate);
-
         // Make movement
         else Move.turnRight(0.8);
         
@@ -392,16 +405,36 @@ void loop()
         break;
     case 260:                                                                           
 
-        // Make movement
-        Move.turnLeft(0.8);
+        // Searching with smoller speed
+        if(LUNAleft > Range) 
+        {
+            Move.turnLeft(0.8*Searching_rotate);
 
-        //Return to the searching mode, if left senzor see nothing, or middle or right senzors see something
-        if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
-        {   
-            state = 230;
+            //Return to the searching mode, if left senzor see nothing, or middle or right senzors see something
+            if(LUNAright < Range || LUNAmiddle < Range) 
+            {   
+                state = 230;
+            }
         }
+        // Make movement
+        else Move.turnLeft(0.8);
         
-        
+
+        // Chacking sides senzor
+        if(SHARPleft || SHARPright)
+        {
+            Tick_Sharp.lastTick = millis();
+            Tick_Sharp.tickNumber = 0;
+
+            if(SHARPleft)
+            {
+                state = 330;
+            }
+            else if(SHARPright)
+            {
+                state = 360;
+            }
+        }       
         break;
     case 290:                                                                           
 
