@@ -208,8 +208,16 @@ void loop()
         {
             LEDRed.blink(500);
 
-            if(SHARPleft) starting_direction = 0;
-            if(SHARPright) starting_direction = 1;
+            if(SHARPleft)
+            { 
+                starting_direction = 0;
+                LEDOrange.setOff();
+            }
+            if(SHARPright) 
+            {
+                LEDOrange.blink(500, 100);
+                starting_direction = 1;
+            }
         }
 
         // after start comand, main code will start running
