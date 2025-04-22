@@ -24,7 +24,7 @@ Motor MotorRight(PIN_MOTOR_RIGHT_NSLEEP, PIN_MOTOR_RIGHT_ENABLE, PIN_MOTOR_RIGHT
 Motion Move(MotorLeft, MotorRight);
 
 // IR, RC-5 and led objects
-DohyoIR Remote(PIN_IR);
+DohyoIR Remote(PIN_IR, 1);
 LED LEDRed(PIN_LED_RED);
 LED LEDOrange(PIN_LED_ORABGE);
 

@@ -18,10 +18,11 @@ class DohyoIR {
         uint16_t mDohyoID;
         uint8_t mStart;
         uint8_t mGotDohyoID;
+        bool enable;
 
     public:
 
-        DohyoIR(uint_fast8_t pin);
+        DohyoIR(uint_fast8_t pin, bool enable);
         void update();
         uint16_t getDohyoID();
         uint8_t isStarted();
@@ -31,9 +32,10 @@ class DohyoIR {
 
 };
 
-DohyoIR::DohyoIR(uint_fast8_t pin) {
+DohyoIR::DohyoIR(uint_fast8_t pin, bool enable) {
 
     IrReceiver.begin(pin);
+    this->enable = enable;
 
 }
 
@@ -47,8 +49,6 @@ void DohyoIR::update() {
             IrReceiver.printIRResultShort(&Serial);
             mAddress = IrReceiver.decodedIRData.address;
             mCommand = IrReceiver.decodedIRData.command;
-            UDP_SendUdpToAll("Adress: " + String(mAddress), 1);
-            UDP_SendUdpToAll("Comand: " + String(mCommand), 1);
 
             switch (mAddress) {
                 case 0x0B:
@@ -60,6 +60,25 @@ void DohyoIR::update() {
                         mStart = mCommand & 0x01;
                         mGotDohyoID = 0;
                     }
+                    break;
+            }
+        } else if(IrReceiver.decodedIRData.protocol == SAMSUNG && enable) {
+
+            IrReceiver.resume();
+            mCommand = IrReceiver.decodedIRData.command;
+
+            switch (mCommand) {
+                case 0x16:
+                    mGotDohyoID = 1;
+                    break;
+                case 0x17:
+        
+                    mStart = 1;
+                    mGotDohyoID = 0;
+                    break;
+                case 0x1F:
+                    
+                    mStart = 0;
                     break;
             }
         } else {
