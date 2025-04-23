@@ -17,27 +17,39 @@
 #include <Arduino.h>
 
 
-// What stuff should be tested.
+// CONFIG.
+// Pins.
+#define IO_VERSION 5
+// Configs.
 #define NEEDED_NVMEM 0
 #define NEEDED_I2C   0
-#define TEST_QRE     0  // Needs nvMem.
-#define TEST_SHARP   0
-#define TEST_PWM     1
-#define TEST_I2C     0  // Needs i2c.
+// What stuff should be tested.
+#define TEST_QRE   0  // Needs nvMem.
+#define TEST_SHARP 0
+#define TEST_PWM   0
+#define TEST_I2C   0  // Needs i2c.
 
 
-#define PWM_TIMEOUT 1200
 
-
-// Includes
+// INCLUDES.
+#include "utils.h"
+// Pins.
+#if IO_VERSION == 4
+  #include "..\..\..\ioPins\ioPinsMk4.h"
+#elif IO_VERSION == 5
+  #include "..\..\..\ioPins\ioPinsMk5.h"
+#else
+  #error "Wrong hardware version."
+#endif
+// Needed stuff.
 #if NEEDED_I2C == 1
   #include "Wire.h"
   #include <vector>
 #endif
-#include "..\..\..\ioPins\ioPins.h"  // Include pins.
 #if NEEDED_NVMEM == 1
   #include "..\..\..\customLibs\nVMemory\nVMemory\nVMemory.h"  // Include non-volatile memory.
 #endif
+// Stuff to test.
 #if TEST_QRE == 1
   #include "..\..\..\customLibs\qre\qre.h"  // Include qre(s).
 #endif
@@ -51,31 +63,24 @@
 
 
 
-// non-volatile memory object.
+// OBJECTS.
+deltaTime deltaTimeObj;
 #if NEEDED_NVMEM == 1
 nVMem nVMemObj;
 #endif
-
-// Qre object.
 #if TEST_QRE == 1
 qre qreObj(&nVMemObj, S_PIN_BUTTON_3, S_PIN_LED_1, S_PIN_LED_2, S_PIN_LED_3);
 #endif
-// Sharp object
 #if TEST_SHARP == 1
 binarySensor sharpBinObj;
 #endif
-// Pwm read.
 #if TEST_PWM == 1
-pwmSensor pwmSensorsObj(PWM_TIMER_CHANNEL);
+  #define N_OF_SENSORS 2
+const uint8_t pwmPins[N_OF_SENSORS] = {S_PIN_POL_PWM_L, S_PIN_POL_PWM_R;
+pwmSensor     pwmSensorObj(pwmPins, N_OF_SENSORS);
+  #undef N_OF_SENSORS
 #endif
 
-uint64_t deltaTime() {
-  static uint64_t loopTime[2];
-  static uint8_t  loopTimeIdx = 0;
-  loopTimeIdx                 = loopTimeIdx ^ 1;
-  loopTime[loopTimeIdx]       = millis();
-  return (loopTime[loopTimeIdx] - loopTime[loopTimeIdx ^ 1]);
-}
 
 
 void setup() {
@@ -83,32 +88,27 @@ void setup() {
   Serial.print("\e[1;1H");  // Set cursor (row,col), (min 1,1).
   Serial.print("\e[2J");    // Clear console.
 
+  // CLASS' SETUPS.
 #if NEEDED_I2C == 1
-  Wire.begin(S_PIN_SDA, S_PIN_SCL, I2C_FREQ);  // I2C.
+  Wire.begin(S_PIN_SDA, S_PIN_SCL, I2C_FREQ);
 #endif
-// non-volatile memory setup.
 #if NEEDED_NVMEM == 1
   nVMemObj.setup();
 #endif
-
-  // Qre setup.
 #if TEST_QRE == 1
   qreObj.setup(S_PIN_QRE_A, S_PIN_QRE_B, S_PIN_QRE_C, true);
 #endif
 #if TEST_SHARP == 1
   sharpBinObj.setup(S_PIN_SHARP_1, S_PIN_SHARP_2);  //TODO TEST - Sensor pins might be reversed.
 #endif
-#if TEST_PWM == 1
-  pinMode(S_PIN_POL_PWM_LEFT, INPUT);
-  pinMode(S_PIN_POL_PWM_RIGHT, INPUT);
-#endif
 }
 
 
 void loop() {
   const char loadingChar[] = {'/', '-', '\\', '|'};
-  uint64_t   deltaTimeVar  = deltaTime();
+  uint64_t   deltaTimeVar  = deltaTimeObj.loop();
 
+  // READING STUFF.
 #if TEST_QRE == 1
   bool qreLeft, qreMid, qreRight;
   char qreLeftChar, qreMidChar, qreRightChar;
@@ -148,10 +148,8 @@ void loop() {
 #endif
 
 #if TEST_PWM == 1
-  uint16_t pwmDistLeft, pwmDistRight;
-  uint8_t  pwmErrorLeft, pwmErrorRight;
-  pwmErrorLeft  = pwmSensorsObj.pwmReadBlocking(S_PIN_POL_PWM_LEFT, &pwmDistLeft, PWM_TIMEOUT, 0);
-  pwmErrorRight = pwmSensorsObj.pwmReadBlocking(S_PIN_POL_PWM_RIGHT, &pwmDistRight, PWM_TIMEOUT, 0);
+  const uint16_t pwmDistanceLeft   = pwmSensorObj.pwmRead(pwmSensorObj.sens.LEFT);
+  const uint16_t pwmDistanceRight  = pwmSensorObj.pwmRead(pwmSensorObj.sens.RIGHT);
 #endif
 
 #if TEST_I2C == 1
@@ -165,7 +163,7 @@ void loop() {
   }
 #endif
 
-
+  // PRINTING STUFF.
   Serial.print("\e[1;1H");                                                           // Set cursor (row,col), (min 1,1).
   Serial.printf("Sumec i/o testing pannel: %c", loadingChar[(millis() / 250) % 4]);  // Header text.
 
@@ -199,8 +197,7 @@ void loop() {
   Serial.print("\e[6;1H");
   Serial.printf("PWM sensor:");  // Pwm sensor stuff.
 #if TEST_PWM == 1
-  Serial.printf("(Left|Right) - (%010u|%010u)", (pwmErrorLeft == 0 ? pwmDistLeft : 0), (pwmErrorRight == 0 ? pwmDistRight : 0));
-  Serial.printf("\tError: (Left|Right) - (%u|%u)", pwmErrorLeft, pwmErrorRight);
+  Serial.printf("(Left|Right) - (%05u|%05u|)", pwmDistanceLeft, pwmDistanceRight);
 #else
   Serial.print("[DISABLED]");
 #endif
