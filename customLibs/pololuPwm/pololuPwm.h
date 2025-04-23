@@ -12,6 +12,7 @@ private:
   uint8_t     pins[MAX_SENSORS];
   static void interruptCallback(void* args);
   uint16_t    microsToMm(int64_t distanceMicros);
+  uint8_t     nOfSensors;
   struct pwmSens {
     const uint8_t LEFT = 0, RIGHT = 1, MIDDLE = 2;
   };
@@ -24,6 +25,27 @@ public:
   uint16_t pwmRead(const uint8_t sensor);
 };
 
+
+
+/**
+ * @param pins Array of pins in the format left, right, middle.
+ * @param pinsSize Length of the pin array.
+ * @brief Sets pinmodes, copies pins, attaches callbacks.
+ */
+pwmSensor::pwmSensor(const uint8_t* pins, uint8_t pinsSize) {
+  if(pinsSize > MAX_SENSORS) {
+    return;
+  }
+
+  nOfSensors = pinsSize;
+  for(uint8_t idx = 0; idx < nOfSensors; idx++) {
+    this->pins[idx] = pins[idx];
+    pinMode(pins[idx], INPUT);
+
+    uint32_t args[] = {(uint32_t)idx, (uint32_t)&pins[idx], (uint32_t)measuredTimes[idx]};
+    attachInterruptArg(pins[idx], interruptCallback, (void*)args, CHANGE);
+  }
+}
 
 
 IRAM_ATTR void pwmSensor::interruptCallback(void* args) {
@@ -54,32 +76,12 @@ uint16_t pwmSensor::microsToMm(int64_t distanceMicros) {
 
 
 /**
- * @param pins Array of pins in the format left, right, middle.
- * @param pinsSize Length of the pin array.
- * @brief Sets pinmodes, copies pins, attaches callbacks.
- */
-pwmSensor::pwmSensor(const uint8_t* pins, uint8_t pinsSize) {
-  if(pinsSize > MAX_SENSORS) {
-    return;
-  }
-
-  for(uint8_t idx = 0; idx < pinsSize; idx++) {
-    this->pins[idx] = pins[idx];
-    pinMode(pins[idx], INPUT);
-
-    uint32_t args[] = {(uint32_t)idx, (uint32_t)&pins[idx], (uint32_t)measuredTimes[idx]};
-    attachInterruptArg(pins[idx], interruptCallback, (void*)args, CHANGE);
-  }
-}
-
-
-/**
  * @param sensor Use pwmSensorObj->sens-><SENSOR>.
  * @returns Measured distance in mm or 0xffff if the sensors id is wrong.
  * @brief Reads a distance from the specified sensor and returns it in mm.
  */
 uint16_t pwmSensor::pwmRead(const uint8_t sensor) {
-  if(sensor >= MAX_SENSORS) {
+  if(sensor >= nOfSensors) {
     return -1;
   }
 
