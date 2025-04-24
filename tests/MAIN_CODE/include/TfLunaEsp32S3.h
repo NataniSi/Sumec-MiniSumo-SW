@@ -24,7 +24,7 @@ void TfL_Setup() {
 	
 	pinMode(15, OUTPUT);
 	
-    Wire.begin(17,18,400000);
+    Wire.begin(42,41,400000);
 }
 
 int TfL_Get(int TfLAddr) {
