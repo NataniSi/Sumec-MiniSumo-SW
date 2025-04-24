@@ -16,15 +16,27 @@ int16_t TfL_Addr2 = 0x10;	//TfL Lib - second address (usualy mid sensor)
 
 int16_t TfL_AddrDefault = 0x10;
 
-void TfL_Setup() {
-	pinMode(41, OUTPUT);
-	pinMode(42, OUTPUT);
-	digitalWrite(41, LOW);
-	digitalWrite(42, LOW);
-	
-	pinMode(15, OUTPUT);
-	
-    Wire.begin(42,41,400000);
+/**
+ * @param sumecVer Version of the pcb. Values can be: 3, 4, 5.
+ * @brief
+ */
+void TfL_Setup(uint8_t sumecVer) {
+	if (sumecVer < 3 || sumecVer > 5)
+	{
+		return;
+	}
+	switch (sumecVer)
+	{
+	case 3:
+		Wire.begin(18, 17, 400000);
+		break;
+	case 4:
+		Wire.begin(17, 18, 400000);
+		break;
+	case 5:
+		Wire.begin(42, 41, 400000);
+		break;
+	}
 }
 
 int TfL_Get(int TfLAddr) {

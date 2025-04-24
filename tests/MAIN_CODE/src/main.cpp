@@ -57,7 +57,9 @@ void setup()
     Tick_free.tickTime = 1;       //this replaces delay
 
     // hardware settings (Setup's):
-    TfL_Setup();
+    #define SUMEC_VER 5
+    TfL_Setup(SUMEC_VER);
+    #undef SUMEC_VER
     pinMode(button, INPUT);
     pinMode(PIN_Start, INPUT);
     pinMode(18, OUTPUT);
@@ -95,14 +97,14 @@ void loop()
 
 
     // Length senzors
-    /*
-    pwmL.pwmRead(&pulseL);
+    
+    /*pwmL.pwmRead(&pulseL);
     pwmR.pwmRead(&pulseR);
     LUNAleft = pwmL.pwmToMm(pulseL);
-    LUNAright = pwmR.pwmToMm(pulseR);
+    LUNAright = pwmR.pwmToMm(pulseR);*/
   
     LUNAmiddle = TfL_Get(TfL_Addr2);
-    */
+    
 
     // side sonzors
     SHARPleft = sharpLeft.get();
@@ -116,7 +118,7 @@ void loop()
 
 
 
-    if(Remote.isStarted() && !Remote.isStopped())
+    /*if(Remote.isStarted() && !Remote.isStopped())
     {
         Move.goForward(1.0);
         Serial.println("start");
@@ -125,10 +127,13 @@ void loop()
     {
         Move.stop();
         Serial.println("PROgram");
-    }
+    }*/
 
-    /*Serial.println(LUNAmiddle);
-    delay(100);*/
+    Serial.print("\x1b[2;1H\x1b[J");
+    tflI2C.printStatus();
+    Serial.print("\t");
+    Serial.println(LUNAmiddle);
+    delay(100);
 
     
     //Serial.println(LUNAleft);
