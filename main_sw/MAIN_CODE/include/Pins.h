@@ -23,13 +23,12 @@
 
 // LED pins
 
-#define PIN_LED_RED             47
+#define PIN_LED_RED             36
 #define PIN_LED_ORABGE          48
 
 // IR sensor pin
 
-#define PIN_IR                  37
-#define PIN_Start               35  //must be edited               
+#define PIN_IR                  37              
 // BUTTON   
 
 #define button                  2

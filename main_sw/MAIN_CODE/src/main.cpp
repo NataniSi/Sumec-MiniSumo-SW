@@ -25,7 +25,7 @@ Motor MotorRight(PIN_MOTOR_RIGHT_NSLEEP, PIN_MOTOR_RIGHT_ENABLE, PIN_MOTOR_RIGHT
 Motion Move(MotorLeft, MotorRight);
 
 // IR, RC-5 and led objects
-DohyoIR Remote(PIN_IR);
+DohyoIR Remote(PIN_IR, 1);
 LED LEDRed(PIN_LED_RED);
 LED LEDOrange(PIN_LED_ORABGE);
 
@@ -60,7 +60,6 @@ void setup()
     // hardware settings (Setup's):
     TfL_Setup();
     pinMode(button, INPUT);
-    pinMode(PIN_Start, INPUT);
     pinMode(6, OUTPUT);
     pinMode(18, OUTPUT);
     Serial.begin(115200);
