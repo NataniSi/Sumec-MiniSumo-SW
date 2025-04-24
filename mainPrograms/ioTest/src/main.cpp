@@ -22,12 +22,15 @@
 #define IO_VERSION 5
 // Configs.
 #define NEEDED_NVMEM 0
-#define NEEDED_I2C   0
+#define NEEDED_I2C   1
 // What stuff should be tested.
 #define TEST_QRE   0  // Needs nvMem.
 #define TEST_SHARP 0
 #define TEST_PWM   0
-#define TEST_I2C   0  // Needs i2c.
+#define TEST_I2C   1  // Needs i2c.
+
+
+#define I2C_FREQ 100*1000
 
 
 
@@ -207,8 +210,9 @@ void loop() {
   Serial.printf("I2C addresses:");  // Connected I2C devices.
 #if TEST_I2C == 1
   for(uint8_t idx = 0; idx < respondingAdresses.size(); idx++) {
-    Serial.printf("\t%x", respondingAdresses.at(idx));
+    Serial.printf("\t0x%x", respondingAdresses.at(idx));
   }
+  respondingAdresses.clear();
 #else
   Serial.print("\t[DISABLED]");
 #endif
