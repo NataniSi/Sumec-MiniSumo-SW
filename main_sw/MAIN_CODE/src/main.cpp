@@ -58,7 +58,7 @@ void setup()
     Tick_free.tickTime = 1;       //this replaces delay
 
     // hardware settings (Setup's):
-    TfL_Setup();
+    TfL_Setup(5);
     pinMode(button, INPUT);
     pinMode(6, OUTPUT);
     pinMode(18, OUTPUT);
@@ -106,8 +106,10 @@ void loop()
     */
 
     // side sonzors
+    LUNAmiddle = TfL_Get(TfL_Addr2);
     SHARPright = sharpLeft.get();
     SHARPleft = sharpRight.get();
+
 
     // Writeing value to TICK
     Tick_managing(Tick_QRE.tickTime, Tick_QRE.tickNumber, Tick_QRE.lastTick, &Tick_QRE.lastTick, &Tick_QRE.tickNumber);
@@ -155,11 +157,11 @@ void loop()
             LINEstate = 4;
 
             break;
-        case 4:     //Go forward    -   I dont know, what it doing -> delete this
+        case 4:     //Go forward    -  
 
-            if(Tick_QRE.tickNumber < 15)
+            if(Tick_QRE.tickNumber < 30)
             {
-                Move.turnLeft(1.0);
+                Move.turnLeft(0.7);
             }
             else
             {
@@ -186,13 +188,14 @@ void loop()
     Serial.print("    ");
     Serial.println(state);*/
 
+    Serial.println(LUNAmiddle);
 /*
-Serial.print(SHARPleft);
+Serial.print(QREleft);
 Serial.print("    ");
-Serial.println(SHARPright);
+Serial.println(QREright);
 */
 
-
+//Serial.println(state);
 
     switch (state)
     {
@@ -306,10 +309,16 @@ Serial.println(SHARPright);
             }
 
         default:                                                                         //Sumec starting inside the ring
+            
+            if(!SHARPright)
+            {
+                Move.turnRight(0.4);
+            } else {
 
-            Move.turnRight(0.7);
-            delay(300);
-            state = tipe_of_strategy;   
+                state = 290;
+                Tick_free.lastTick = millis();
+                Tick_free.tickNumber = 0;
+            }
             break;
         }      
         break;
@@ -351,21 +360,13 @@ Serial.println(SHARPright);
 
     case 230:                                                                           // Turn Right 
 
-        Move.goForward(0.3);
+        Move.turnRight(0.3);
         //digitalWrite(6, 1);
         
         /*if(LUNAleft < Range && LUNAmiddle > Range)
         {
             //UDP_SendUdpToAll("state_260", 1);
             state = 260;
-        }
-        if(LUNAmiddle < Range)
-        {
-            //UDP_SendUdpToAll("state_290", 1);
-            state = 290;
-
-            Tick_free.lastTick = millis();
-            Tick_free.tickNumber = 0;
         }
         if(LUNAright < Range)
         {
@@ -374,6 +375,15 @@ Serial.println(SHARPright);
 
             
         }*/
+
+        if(LUNAmiddle < Range)
+        {
+            //UDP_SendUdpToAll("state_290", 1);
+            state = 290;
+
+            Tick_free.lastTick = millis();
+            Tick_free.tickNumber = 0;
+        }
         
         if(SHARPleft || SHARPright)
         {
@@ -383,19 +393,19 @@ Serial.println(SHARPright);
             if(SHARPleft)
             {
                 //UDP_SendUdpToAll("state_330", 1);
-                state = 330;
+                state = 360;
             }
             else if(SHARPright)
             {
                 //UDP_SendUdpToAll("state_360", 1);
-                state = 360;
+                state = 330;
             }
         }
         
         break;
     case 231:
 
-        Move.turnRight(0.3, 0.2);
+        Move.turnRight(0.6, 0.2);
 
         if(LUNAright > Range && (LUNAleft < Range || LUNAmiddle < Range)) 
         {   
@@ -415,7 +425,7 @@ Serial.println(SHARPright);
         break;
     case 260:                                                                           // Turn Left
 
-        Move.turnLeft(0.3, 0.2);
+        Move.turnLeft(0.6, 0.2);
 
         if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
         {   
@@ -438,52 +448,17 @@ Serial.println(SHARPright);
         break;
     case 290:                                                                           // Go Forward
 
-        /*
-        if(Tick_free.tickNumber >= 2000)
+
+
+        if(LUNAmiddle > Range && Tick_free.tickNumber > 5)    
         {
-            if(Tick_free.tickNumber < 2025)
-            {
-                Move.turnRight(1.0);
-            }
-            else if(Tick_free.tickNumber < 2050)
-            {
-                Move.turnLeft(1.0);
-            }
-            else
-            {
-
-                if(LUNAmiddle > (Range+5))    
-                {
-                    //UDP_SendUdpToAll("state_230", 1);
-                    state = 230;
-                }
-
-                Tick_free.tickNumber = 2000;
-            }
+            //UDP_SendUdpToAll("state_230", 1);
+            state = 230;
         }
-        else
-        {*/
 
-            if(LUNAmiddle > Range /*&& Tick_free.tickNumber > 10*/)    
-            {
-                //UDP_SendUdpToAll("state_230", 1);
-                state = 230;
-            }
+        if(Tick_free.tickNumber < 5) Move.goForward(0.8);
+        else Move.goForward(1.0);
 
-            if(LUNAright < Range) 
-            {   
-                //UDP_SendUdpToAll("state_230", 1);
-                state = 231;
-            }
-
-            if(LUNAleft < Range) 
-            {   
-                //UDP_SendUdpToAll("state_230", 1);
-                state = 260;
-            }
-
-            Move.goForward(0.5);
-        //}
 
         break;
 
@@ -492,18 +467,22 @@ Serial.println(SHARPright);
 
     case 330:                                                                           // Turn Right diagonaly and Turn Right 
 
-        if(!SHARPleft) state = 230;
+        if(!SHARPright) state = 230;
 
-        Move.turnRight(0.2, 0.1);
+        if(LUNAmiddle < Range) state = 290;
+
+        Move.turnLeft(0.6, 0.9);
         Tick_free.lastTick = millis();
         Tick_free.tickNumber = 0;       
 
         break;
     case 360:                                                                           // Turn Left diagonaly and Turn Left 
 
-        if(!SHARPright) state = 230;
+        if(!SHARPleft) state = 230;
 
-        Move.turnLeft(0.2, 0.2);
+        if(LUNAmiddle < Range) state = 290;
+
+        Move.turnRight(0.6, 0.9);
         Tick_free.lastTick = millis();
         Tick_free.tickNumber = 0;        
         
