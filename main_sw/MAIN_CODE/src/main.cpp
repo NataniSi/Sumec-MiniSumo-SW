@@ -67,9 +67,10 @@ void loop()
     LEDRed.update();            //updates the red led
     LEDOrange.update();         //updates the orange led
     Remote.update();
+    START = digitalRead(PIN_Start);
 
-
-    if(Remote.isStopped()) 
+    
+    if(/*Remote.isStopped()*/!START) 
     {
         state = 0;
         Move.stop();
@@ -221,7 +222,7 @@ void loop()
         }
 
         // after start comand, main code will start running
-        if (Remote.isStarted())
+        if (/*Remote.isStarted()*/START)
         {
             state = 002;
             Tick_Start.tickNumber = 0;
