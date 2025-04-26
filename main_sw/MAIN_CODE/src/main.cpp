@@ -79,13 +79,13 @@ void loop()
     LEDOrange.update();         //updates the orange led
     Remote.update();
 
-    /*
-    if(Remote.isStopped()) 
+    
+    if(/*Remote.isStopped()*/!START) 
     {
         state = 0;
         Move.stop();
         LEDRed.blink(500);
-    }*/
+    }
 
     //=========================Writeing value from sensors to variables=============
 
