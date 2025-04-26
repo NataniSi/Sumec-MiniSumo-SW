@@ -52,6 +52,7 @@ void loop()
     LEDRed.update();            //updates the red led
     LEDOrange.update();         //updates the orange led
     Remote.update();
+    START = digitalRead(PIN_Start);
 
 
     // Button
@@ -62,7 +63,7 @@ void loop()
 
     //===========================Normal process===============================
 
-    if(Remote.isStopped()) 
+    if(/*Remote.isStopped()*/!START) 
     {
         Move.stop();
         LEDOrange.blink(500);
@@ -78,7 +79,7 @@ void loop()
     }
 
     // after start comand, main code will start running
-    if (Remote.isStarted())
+    if (/*Remote.isStarted()*/START)
     {
         LEDOrange.blink(100);
         Move.goForward(1.0);
