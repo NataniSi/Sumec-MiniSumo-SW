@@ -62,6 +62,7 @@ void setup()
     pinMode(button, INPUT);
     pinMode(6, OUTPUT);
     pinMode(18, OUTPUT);
+    pinMode(S_module, INPUT);
     Serial.begin(115200);
     UDP_Setup();
     pwmL.pwmSetup();
@@ -78,13 +79,13 @@ void loop()
     LEDOrange.update();         //updates the orange led
     Remote.update();
 
-
+    /*
     if(Remote.isStopped()) 
     {
         state = 0;
         Move.stop();
         LEDRed.blink(500);
-    }
+    }*/
 
     //=========================Writeing value from sensors to variables=============
 
@@ -104,6 +105,9 @@ void loop()
     LUNAright = round(pwmR.pwmToMm(pulseR)/10);
     LUNAmiddle = TfL_Get(TfL_Addr2);
     */
+
+
+    START = digitalRead(S_module);
 
     // side sonzors
     LUNAmiddle = TfL_Get(TfL_Addr2);
@@ -195,7 +199,9 @@ Serial.print("    ");
 Serial.println(QREright);
 */
 
-//Serial.println(state);
+Serial.print(digitalRead(S_module));
+Serial.print("    ");
+Serial.println(state);
 
     switch (state)
     {
@@ -216,7 +222,7 @@ Serial.println(QREright);
         }
 
         // after start comand, main code will start running
-        if (Remote.isStarted())
+        if (/*Remote.isStarted()*/START)
         {
             //UDP_SendUdpToAll("======================", 1);
             state = 002;
