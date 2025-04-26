@@ -188,7 +188,7 @@ void loop()
     Serial.print("    ");
     Serial.println(state);*/
 
-    Serial.println(LUNAmiddle);
+    //Serial.println(LUNAmiddle);
 /*
 Serial.print(QREleft);
 Serial.print("    ");
