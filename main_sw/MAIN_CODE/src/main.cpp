@@ -68,8 +68,8 @@ void setup()
     pwmL.pwmSetup();
     pwmR.pwmSetup();
 
-    qreLeft.Threshold = 3000;
-    qreRight.Threshold = 3000;
+    qreLeft.Threshold = 1800;
+    qreRight.Threshold = 1800;
 }
 
 void loop()
@@ -80,7 +80,7 @@ void loop()
     Remote.update();
 
     
-    if(/*Remote.isStopped()*/!START) 
+    if(Remote.isStopped()) 
     {
         state = 0;
         Move.stop();
@@ -89,8 +89,6 @@ void loop()
 
     //=========================Writeing value from sensors to variables=============
 
-    // Button
-    bootonOld = digitalRead(button);
 
     // Line sonzors
     QREleft = qreLeft.get();
@@ -107,7 +105,7 @@ void loop()
     */
 
 
-    START = digitalRead(S_module);
+
 
     // side sonzors
     LUNAmiddle = TfL_Get(TfL_Addr2);
@@ -199,9 +197,7 @@ Serial.print("    ");
 Serial.println(QREright);
 */
 
-Serial.print(digitalRead(S_module));
-Serial.print("    ");
-Serial.println(state);
+
 
     switch (state)
     {
@@ -216,13 +212,15 @@ Serial.println(state);
 
             Tick_Sharp.lastTick = millis();
             Tick_Sharp.tickNumber = 0;
+
+            //analogWrite(buzzer, 200);
         } else
         {
             LEDRed.blink(500);
         }
 
         // after start comand, main code will start running
-        if (Remote.isStarted())
+        if (Remote.isStarted() || START)
         {
             //UDP_SendUdpToAll("======================", 1);
             state = 002;
@@ -455,7 +453,7 @@ Serial.println(state);
     case 290:                                                                           // Go Forward
 
 
-        if(Tick_free.tickNumber < 20)
+        if(Tick_free.tickNumber < 30)
         {
             Move.goForward(1.0);
         }
