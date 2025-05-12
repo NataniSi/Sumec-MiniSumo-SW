@@ -176,15 +176,15 @@ void loop()
         Serial.print(" ");
         Serial.print(LUNAmiddle);
         Serial.print(" ");
-        Serial.print(LUNAright);
-        Serial.print("    ");
+        Serial.println(LUNAright);
+       /*Serial.print("    ");
         Serial.print(QREright);
         Serial.print(" ");
         Serial.println(qreBack.getRaw());
         Serial.print("    ");
-        Serial.print(state);
+        Serial.print(state);*/
     }
-    Serial.println(starting_direction);
+    //Serial.println(starting_direction);
 
     switch (state)
     {
@@ -222,7 +222,7 @@ void loop()
         }
 
         // after start comand, main code will start running
-        if (/*Remote.isStarted()*/START)
+        if (Remote.isStarted())
         {
             state = 002;
             Tick_Start.tickNumber = 0;

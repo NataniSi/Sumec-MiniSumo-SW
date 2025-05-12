@@ -5,7 +5,7 @@
 
 #define Range 60                 // Length senzor range[cm] for decision, is enybodey there?
 #define Type_of_starting 0       // 0 = IR led, 1 = IR modul
-#define tests 0                  // tests: 0 = off, 1 = on
+#define tests 1                  // tests: 0 = off, 1 = on
 #define Searching_rotate 0.7
 #define AnotherStarting 1
 
