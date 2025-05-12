@@ -16,6 +16,7 @@
 #include <TfLunaEsp32S3.h>
 #include <Sharp_GP2Y0D810Z0F.h>
 #include "pololuPwm.h"
+#include "MusicBuzzer.cpp"
 
 //=================== DECLARING OBJECTs ===================
 
