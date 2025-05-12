@@ -144,9 +144,9 @@ void loop()
             break;
         case 2:     //Go backward
 
-            if(Tick_QRE.tickNumber < 10)
+            if(Tick_QRE.tickNumber < 30)
             {
-                Move.goBackward(0.5);
+                Move.goBackward(0.35);
             }
             else
             {
@@ -163,9 +163,9 @@ void loop()
             break;
         case 4:     //Go forward    -  
 
-            if(Tick_QRE.tickNumber < 30)
+            if(Tick_QRE.tickNumber < 60)
             {
-                Move.turnLeft(0.7);
+                Move.turnLeft(0.4);
             }
             else
             {
@@ -222,7 +222,7 @@ Serial.println(state);
         }
 
         // after start comand, main code will start running
-        if (/*Remote.isStarted()*/START)
+        if (Remote.isStarted())
         {
             //UDP_SendUdpToAll("======================", 1);
             state = 002;
@@ -455,15 +455,15 @@ Serial.println(state);
     case 290:                                                                           // Go Forward
 
 
-
-        if(LUNAmiddle > Range && Tick_free.tickNumber > 5)    
+        if(Tick_free.tickNumber < 20)
+        {
+            Move.goForward(1.0);
+        }
+        else if(LUNAmiddle > Range && Tick_free.tickNumber > 20)    
         {
             //UDP_SendUdpToAll("state_230", 1);
             state = 230;
         }
-
-        if(Tick_free.tickNumber < 5) Move.goForward(0.8);
-        else Move.goForward(1.0);
 
 
         break;
