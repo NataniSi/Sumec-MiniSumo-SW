@@ -177,12 +177,12 @@ void loop()
         Serial.print(LUNAmiddle);
         Serial.print(" ");
         Serial.println(LUNAright);
-       /*Serial.print("    ");
+       Serial.print("    ");
         Serial.print(QREright);
         Serial.print(" ");
         Serial.println(qreBack.getRaw());
         Serial.print("    ");
-        Serial.print(state);*/
+        Serial.print(state);
     }
     //Serial.println(starting_direction);
 
@@ -224,6 +224,7 @@ void loop()
         // after start comand, main code will start running
         if (Remote.isStarted())
         {
+            delay(5000);
             state = 002;
             Tick_Start.tickNumber = 0;
             LINEstate = 0;
