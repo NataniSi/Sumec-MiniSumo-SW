@@ -70,7 +70,7 @@ void loop()
     START = digitalRead(PIN_Start);
 
     
-    if(/*Remote.isStopped()*/!START) 
+    if(Remote.isStopped()) 
     {
         state = 0;
         Move.stop();
