@@ -223,7 +223,6 @@ Serial.println(QREright);
         // after start comand, main code will start running
         if (Remote.isStarted()/* || START*/)
         {
-            delay(5000);
             //UDP_SendUdpToAll("======================", 1);
             state = 002;
             Tick_Start.tickNumber = 0;
