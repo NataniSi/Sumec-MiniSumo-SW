@@ -57,8 +57,8 @@ void setup()
     Serial.begin(115200);
 
 
-    qreLeft.Threshold = 3000;
-    qreRight.Threshold = 3000;
+    qreLeft.Threshold = 1800;
+    qreRight.Threshold = 1800;
 }
 
 void loop()
@@ -172,17 +172,21 @@ void loop()
     // printing values from senzors to chack, is it ok
     if(tests)
     {    
-        Serial.print(LUNAleft);
+        /*Serial.print(LUNAleft);
         Serial.print(" ");
         Serial.print(LUNAmiddle);
         Serial.print(" ");
         Serial.println(LUNAright);
-       Serial.print("    ");
+        Serial.print("    ");
         Serial.print(QREright);
         Serial.print(" ");
-        Serial.println(qreBack.getRaw());
-        Serial.print("    ");
-        Serial.print(state);
+        Serial.println(QREleft);*/
+        Serial.print(SHARPleft);
+        Serial.print(" ");
+        Serial.println(SHARPright);
+        //Serial.println("    ");
+        //Serial.print(state);
+    
     }
     //Serial.println(starting_direction);
 
