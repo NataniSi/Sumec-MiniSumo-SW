@@ -228,7 +228,6 @@ void loop()
         // after start comand, main code will start running
         if (Remote.isStarted())
         {
-            delay(5000);
             state = 002;
             Tick_Start.tickNumber = 0;
             LINEstate = 0;
