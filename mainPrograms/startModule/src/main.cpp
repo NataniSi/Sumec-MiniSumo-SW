@@ -1,381 +1,189 @@
-
-#if 1
 /**
- * https://www.instructables.com/ATTiny-Port-Manipulation/
- * https://www.instructables.com/ATtiny85-Interrupt-Barebones-Example/
- * https://en.wikipedia.org/wiki/RC-5
+ * PINS
+ * pin  | gpio  | meta    | other   | i2c   | remote
+ * 1    | 5     | reset   | adc0    |       | reset (also known as reset)
+ * 2    | 3     | -       | adc3    |       | dataOut
+ * 3    | 4     | -       | adc2    |       | dataIn
+ * 4    | gnd   | gnd     | -       |       | gnd
+ * 5    | 0     | mosi    | pwm0    | sda   | led2 (yellow)
+ * 6    | 1     | miso    | pwm1    |       | led1 (blue)
+ * 7    | 2     | sck     | adc1    | scl   | 
+ * 8    | vcc   | vcc     | -       |       | vcc
+ */
+/**
+ * RC5 DATA
+ * 11<toggle_bit:1><command_type:5><id:5><data:1>
+ *  - toggle_bit - helps differentiate between an intended and unintended signal interruption
+ *  - command_type - either 7 or 11
+ *    - 7 - robot state
+ *    - 11 - set id
+ *  - id - the id to either verify or set, same as the dip switches on the remote
+ *  - data - an additional bit that does stuff in pair with the command_type
+ *    - command_type == 7 && data == 1 - start
+ *    - command_type == 7 && data == 0 - stop
+ *    - command_type == 11 - always 0
+ */
+/**
+ * MODULE OUTPUT
+ *  - 0 - stop
+ *  - 1 - go
  */
 
-/**
- * This feels like a lot of janky hacked together trash.
- * Hope it works.
- */
+/** TODO: Add the led stuff */
 
-  #include <Arduino.h>
+#include <Arduino.h>
+#include "decoding.h"
+#include "parsing.h"
 
-
-  #define PIN_STATE_OUT 3
-  #define PIN_IR_INPUT  4
-  #define PIN_LED1      1
-  #define PIN_LED2      0
-
-  #define RECIEVE_TIMEOUT 3    // In ms. How long since the last trigger should be considered an end.
-  #define BIT_MIN_TIME    750  // In us. Anything shorter than this is noise.
-  #define BUFFER_SIZE     32
-
-
-  #define PROTOCOL_RC5    1
-  #define RC5_SINGLE_LOW  800
-  #define RC5_SINGLE_HIGH 1000
-  #define RC5_DOUBLE_LOW  1600
-  #define RC5_DOUBLE_HIGH 2000
-
-
-  #define SET_TO_BIT(BIT, OUT_ARRAY_INDEX, OUT_ARRAY)                                                                          \
-    if((BIT) == 0) {                                                                                                           \
-      OUT_ARRAY &= 1 << OUT_ARRAY_INDEX;                                                                                       \
-    } else {                                                                                                                   \
-      OUT_ARRAY |= 0 << OUT_ARRAY_INDEX;                                                                                       \
-    }
-
-  #define DIV_TWO_CEIL(SRC, DST)                                                                                               \
-    if((SRC & 1) == 1) {                                                                                                       \
-      DST = SRC >> 1;                                                                                                          \
-      DST = SRC + 1;                                                                                                           \
-    } else {                                                                                                                   \
-      DST = SRC >> 1;                                                                                                          \
-    }
+#define PIN_STATE_OUT 3
+#define PIN_IR_INPUT  4
+#define PIN_LED1      1
+#define PIN_LED2      0
 
 
 
-uint64_t             rawBuffer                    = 0;
-static const uint8_t rawBufferSize                = (BUFFER_SIZE < sizeof(rawBuffer) * 8 ? BUFFER_SIZE : sizeof(rawBuffer) * 8);
-uint16_t             rawBufferTime[rawBufferSize] = {0};
-uint8_t              rawBufferIndex               = 0;
-uint32_t             recieveTimeoutTime           = -1;
+enum State { IDLE, READING, DECODING, PARSING, SETTING_OUTPUT };
+enum CommandType { ROBOT_STATE = 7, SET_ID = 11 };
+
+
+#define TX PIN_LED2
+
+#define SHORT_GAP_MAX 1400
+#define READ_TIMEOUT  25000
+
+#define LED1_BLINK_TIME 1000
+#define LED2_BLINK_TIME 200
 
 
 
-void irInterrupt() {
-  static uint32_t timeSinceLastTrig = 0;
-
-  // Read the volatile stuff.
-  uint32_t timeNow = micros();
-  bool     irVal   = (DDRB >> PIN_IR_INPUT) & PB1;
-
-
-  // Write the length of the previous bit.
-  rawBufferTime[rawBufferIndex] = timeNow - timeSinceLastTrig;
-
-  // Move to the current bit.
-  rawBufferIndex++;
-  // If buffer full, return.
-  if(rawBufferIndex + 1 >= rawBufferSize) {
-    return;
-  }
-
-  // Add the value to the buffer.
-  SET_TO_BIT(irVal, rawBufferIndex, rawBuffer)
-  // Update time since last trig.
-  timeSinceLastTrig = timeNow;
-
-  // Update the timeout time.
-  recieveTimeoutTime = millis() + RECIEVE_TIMEOUT;
-}
-
-
-uint64_t             cleanBuffer     = 0;
-static const uint8_t cleanBufferSize = (BUFFER_SIZE < sizeof(cleanBuffer) * 8 ? BUFFER_SIZE : sizeof(cleanBuffer) * 8);
-uint16_t             cleanBufferTime[cleanBufferSize] = {0};
-uint8_t              cleanBufferIndex                 = 0;
-
-void reduceBuffer() {
-  static uint8_t bitWriteIdx = 0;
-  for(uint8_t idx = 0; idx < cleanBufferIndex; idx++) {
-    static uint8_t bitPrevoius = 0xff;
-    bool           bitCurrent  = (cleanBuffer >> idx) & 1;
-    if(bitPrevoius == bitCurrent) {
-      // Add this bit's length to the prevoius one.
-      cleanBufferTime[bitWriteIdx - 1] += cleanBufferTime[idx];
-    } else {
-      // Just move the bit to a new pos.
-      SET_TO_BIT(bitCurrent, cleanBuffer, bitWriteIdx)
-      cleanBufferTime[bitWriteIdx] = cleanBufferTime[idx];
-      bitWriteIdx++;
-    }
-
-    bitPrevoius = bitCurrent;
-  }
-}
-
-
-void denoiseBuffer() {
-  uint16_t accumulatedTime = 0;
-  // Check the length of every bit.
-  for(uint8_t idx = 0; idx < rawBufferIndex; idx++) {
-    accumulatedTime += rawBufferTime[idx];
-    // Isn't noise.
-    if(rawBufferTime[idx] >= BIT_MIN_TIME) {
-      // Shift the bit into the clean buffer.
-      SET_TO_BIT((rawBuffer >> idx) & 1, cleanBufferIndex, cleanBuffer)
-      // Set the bits length since the prevoius "clean" bit.
-      cleanBufferTime[cleanBufferIndex] = accumulatedTime;
-      // Shift and reset.
-      cleanBufferIndex++;
-      accumulatedTime = 0;
-    }
-  }
-
-  // Remove repeating bits, join their lengths.
-  reduceBuffer();
-
-  // Move the end stop by what's been reduced.
-  cleanBufferIndex = accumulatedTime;
-}
-
-
-void resetRawBuffer() {
-  memset(rawBufferTime, 0, rawBufferSize);
-  rawBufferIndex     = 0;
-  rawBuffer          = 0;
-  recieveTimeoutTime = -1;
-}
-
-
-void resetCleanBuffer() {
-  memset(cleanBufferTime, 0, cleanBufferSize);
-  cleanBufferIndex = 0;
-  cleanBuffer      = 0;
-}
-
-
-/** TODO: fix this */
-uint8_t detectProtocol() {
-  return PROTOCOL_RC5;
-  return 0;
-}
-
-
-bool decodeRc5(uint8_t*       toggle,
-               uint8_t*       address,
-               uint8_t*       command,
-               const uint64_t buffer,
-               uint16_t*      bufferTime,
-               const uint8_t  bufferSize) {
-  /*for(uint8_t idx = 0; idx < bufferSize; idx++) {  // DEBUG
-    Serial.printf("%02x\t%u\t%lu\n", idx, (buffer >> idx) & 1, bufferTime[idx]);
-  }*/
-
-  uint64_t decodedBits      = 0;
-  uint8_t  decodedBitsIndex = 0;  // 26 or 27
-  // Filter rc5 specific lengths.
-  for(uint8_t idx = 0; idx < bufferSize; idx++) {
-    if(bufferTime[idx] > RC5_SINGLE_LOW && bufferTime[idx] < RC5_SINGLE_HIGH) {
-      SET_TO_BIT(((buffer >> idx) & 1), decodedBitsIndex, decodedBits)
-      decodedBitsIndex++;
-    } else if(bufferTime[idx] > RC5_DOUBLE_LOW && bufferTime[idx] < RC5_DOUBLE_HIGH) {
-      SET_TO_BIT(((buffer >> idx) & 1), decodedBitsIndex, decodedBits)
-      decodedBitsIndex++;
-      SET_TO_BIT(((buffer >> idx) & 1), decodedBitsIndex, decodedBits)
-      decodedBitsIndex++;
-    }
-  }
-  if(decodedBitsIndex < 26 || decodedBitsIndex > 27) {
-    return 0;
-  }
-
-
-  // Remove the half bit.
-  decodedBitsIndex = decodedBitsIndex - 1;
-  decodedBits      = decodedBits >> 1;
-
-  // Split the buffer into pairs.
-  DIV_TWO_CEIL(decodedBitsIndex, decodedBitsIndex)
-  // Take the first bit from the pair.
-  for(uint8_t idx = 0; idx < decodedBitsIndex; idx++) {
-    SET_TO_BIT(((decodedBits >> idx * 2) & 1), idx, decodedBits)
-  }
-
-  // Remove the second start bit.
-  decodedBits = decodedBits >> 1;
-
-  *toggle  = decodedBits & 1;
-  *address = (decodedBits >> 1) & 0b11111;
-  *command = (decodedBits >> 6) & 0b111111;
-  return 1;
-}
-
-
-bool irCheck(uint8_t* toggle, uint8_t* address, uint8_t* command) {
-  uint8_t returnStatus = 0;
-  noInterrupts();
-  // Check if the reading has finished.
-  if(recieveTimeoutTime <= millis()) {
-    denoiseBuffer();
-
-    // Add new protocols here.
-    switch(detectProtocol()) {
-      case PROTOCOL_RC5:
-        returnStatus = decodeRc5(toggle, address, command, cleanBuffer, cleanBufferTime, cleanBufferIndex);
-        break;
-
-      default:  // Unknown protocol.
-        break;
-    }
-  }
-
-  // Reset buffer and re-enable interrupts.
-  resetRawBuffer();
-  resetCleanBuffer();
-  interrupts();
-  return returnStatus;
-}
-
-
-struct led {
-private:
-  uint8_t  pin          = -1;
-  uint16_t durationHigh = 0;
-  uint16_t durationLow  = 0;
-  uint8_t  repeats      = 0;
-  uint32_t timeStart    = 0;
-  uint32_t timeEnd      = 0;
-
-public:
-  led(uint8_t pin) {
-    this->pin = pin;
-    pinMode(pin, OUTPUT);
-  }
-
-  void set(uint16_t durationHigh, uint16_t durationLow, uint8_t repeats) {
-    this->durationHigh = durationHigh;
-    this->durationLow  = durationLow;
-    this->repeats      = repeats;
-    timeStart          = millis();
-    timeEnd            = timeStart + ((durationHigh + durationLow) * repeats);
-  }
-
-  void loop() {
-    uint32_t timeNow = millis();
-    if(timeNow > timeEnd) {
-      return;
-    }
-
-    uint32_t timeRunning = timeNow - timeStart;
-    timeRunning          = timeRunning % (durationHigh + durationLow);
-
-    if(timeRunning <= durationHigh) {
-      digitalWrite(pin, 1);
-    } else {
-      digitalWrite(pin, 0);
-    }
-  }
-
-  // Check if running.
-  bool check() {
-    if(millis() < timeEnd) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-};
-
-
-
-led led1Obj(PIN_LED1);
-led led2Obj(PIN_LED2);
-
-
-void           setup() {
-  delay(2000);           // DEBUG
-  Serial.begin(115200);  // DEBUG
-  delay(2000);           // DEBUG
-  Serial.println("BEGIN"); // DEBUG
+void ioInnit() {
   pinMode(PIN_IR_INPUT, INPUT);
   pinMode(PIN_STATE_OUT, OUTPUT);
+  pinMode(PIN_LED2, OUTPUT);
+  pinMode(PIN_LED1, OUTPUT);
+  digitalWrite(PIN_IR_INPUT, 0);
   digitalWrite(PIN_STATE_OUT, 0);
-  attachInterrupt(PIN_IR_INPUT, irInterrupt, CHANGE);
-  /*
-  DDRB |= 1 << PIN_STATE_OUT;  // Set 3 as output.
-  DDRB &= 0 << PIN_IR_INPUT;   // Set 4 as input.
-  DDRB |= 1 << PIN_LED1;  // Set 1 as output.
-  DDRB |= 1 << PIN_LED2;  // Set 0 as output.
-  
-  PORTB |= 1 << DDB3;
-  PORTB &= 0 << DDB3;
-  (PORTB >> DDB3) & 1;*/
+  digitalWrite(PIN_LED1, 0);
+  digitalWrite(PIN_LED2, 0);
 }
 
 
-void loop() {
-  bool           changeState    = 0;  // Whether to change state this loop.
-  uint8_t        recievedToggle = 0, recievedAddress = 0, recievedCommand = 0;
-  static uint8_t recievedTogglePrev = -1, recievedAddressPrev = -1, recievedCommandPrev = -1;
+void setup() {
+  ioInnit();
+}
 
-  // Check for ir.
-  if(irCheck(&recievedToggle, &recievedAddress, &recievedCommand)) {
-    //Serial.printf("tgl: %u\naddr: 0x%x\tcmd: 0x%x\n", recievedToggle, recievedAddress, recievedCommand);  // DEBUG
-    /** TODO: do something with these */
-    // Detect only change.
-    if(recievedToggle != recievedTogglePrev && recievedAddress != recievedAddressPrev &&
-       recievedCommand != recievedCommandPrev) {
-         recievedTogglePrev  = recievedToggle;
-         recievedAddressPrev = recievedAddress;
-         recievedCommandPrev = recievedCommand;
-         changeState         = 1;
-        }
-      } else {
-        //Serial.println("ReadErr");  // DEBUG
+void loop() {
+  static State    state      = State::IDLE;
+  static uint32_t trigMicros = 0, trigMicrosPrev = 0;
+  uint32_t        microsNow = 0;
+  static uint32_t buffer;
+  bool            irVal     = 0;
+  static bool     irValPrev = 0;
+
+  static uint16_t decodedBits = 0;
+  static parsed   parsedObj;
+
+  static uint8_t id     = 0;
+  static bool    output = 0, outputPrev = 0;
+  static bool    outputL1 = 0, outputL1Prev = 0;
+  static bool    outputL2 = 0, outputL2Prev = 0;
+
+  static uint8_t led2BlinkCount = 0;
+  static uint32_t led2BlinkPrev = 0;
+  static uint32_t led1BlinkPrev = 0;
+
+  uint32_t millisNow = 0;
+
+
+  switch(state) {
+    case State::IDLE:
+      microsNow = micros();
+      irVal     = !digitalRead(PIN_IR_INPUT);
+      if(irVal == 1) {
+        trigMicros = microsNow;
+        state      = State::READING;
       }
-      
-      static uint8_t state = 0, statePrev = -1;
-      #define STATE_WAITING 0
-      #define STATE_RUNNING 1
-      #define STATE_STOPPED 2
-      switch(state) {
-        case STATE_WAITING:
-        if(changeState == 1) {
-          // On enter.
-          if(state != statePrev) {
-            statePrev = state;
+      break;
+
+    case State::READING:
+      microsNow = micros();
+      irVal     = !digitalRead(PIN_IR_INPUT);
+      if(irVal != irValPrev) {
+        irValPrev      = irVal;
+        trigMicrosPrev = trigMicros;
+        trigMicros     = microsNow;
+        if(trigMicros - trigMicrosPrev > SHORT_GAP_MAX) {
+          buffer = buffer << 1;
+          buffer = buffer + 1;
+        } else {
+          buffer = buffer << 1;
+        }
+      } else if(microsNow - trigMicros > READ_TIMEOUT) {
+        state = State::DECODING;
+      }
+      break;
+
+    case State::DECODING:
+      decodedBits = decodeTheMess(buffer);
+      state       = State::PARSING;
+      break;
+
+    case State::PARSING:
+      parsedObj = parse(decodedBits);
+      state     = State::SETTING_OUTPUT;
+      break;
+
+    case State::SETTING_OUTPUT:
+      switch(parsedObj.command_type) {
+        case CommandType::ROBOT_STATE:
+          if(parsedObj.id == id) {
+            output = parsedObj.data;
           }
-        }
-        break;
-        
-        case STATE_RUNNING:
-        if(changeState == 1) {
-        }
-        break;
-        
-        case STATE_STOPPED:
-        if(changeState == 1) {
+          break;
+
+        case CommandType::SET_ID:
+          id = parsedObj.id;
+          outputL2 = 0;
+          led2BlinkCount = 4;
+          break;
+
+        default:
+          break;
       }
+      buffer = 0;
+      state  = State::IDLE;
       break;
 
     default:
-      state = STATE_STOPPED;
       break;
   }
 
-  Serial.print("ALIVE: ");
-  Serial.println(millis());
-  delay(50);
-}
-#else
+  millisNow = millis();
 
-  #include <Arduino.h>
+  if(led2BlinkCount > 0) {
+    if(millisNow - led2BlinkPrev > LED2_BLINK_TIME) {
+      led2BlinkPrev = millisNow;
+      outputL2 = !outputL2;
+      led2BlinkCount--;
+    }
+  }
+  if(millisNow - led1BlinkPrev > LED1_BLINK_TIME) {
+    led1BlinkPrev = millisNow;
+    outputL1 = !outputL1;
+  }
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(3, OUTPUT);
-}
 
-void loop() {
-  Serial.println("Hewwo wowd :3");
-  digitalWrite(3, 1);
-  delay(500);
-  digitalWrite(3, 0);
-  delay(500);
+  if(output != outputPrev) {
+    outputPrev = output;
+    digitalWrite(PIN_STATE_OUT, output);
+    outputL2 = output;
+  }
+  if(outputL1 != outputL1Prev) {
+    outputL1Prev = outputL1;
+    digitalWrite(PIN_LED1, outputL1);
+  }
+  if(outputL2 != outputL2Prev) {
+    outputL2Prev = outputL2;
+    digitalWrite(PIN_LED2, outputL2);
+  }
 }
-#endif
