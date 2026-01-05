@@ -43,6 +43,8 @@ Sharp sharpRight('R');
 pwmSensor pwmL(16, 4);
 pwmSensor pwmR(5, 5);
 
+MusicBuzzerClass My_buzzer;
+
 uint16_t pulseL;
 uint16_t pulseR;
 
@@ -60,12 +62,13 @@ void setup()
 
     // hardware settings (Setup's):
     TfL_Setup(5);
-    pinMode(button, INPUT);
+    pinMode(button04, INPUT_PULLUP);
     pinMode(6, OUTPUT);
     pinMode(18, OUTPUT);
     pinMode(S_module, INPUT);
     Serial.begin(115200);
     UDP_Setup();
+    My_buzzer.init(bzucak);
     pwmL.pwmSetup();
     pwmR.pwmSetup();
 
@@ -75,18 +78,28 @@ void setup()
 
 void loop()
 {
- 
     LEDRed.update();            //updates the red led
     LEDOrange.update();         //updates the orange led
     Remote.update();
+    bool button_now = digitalRead(button04);
 
-    
-    if(Remote.isStopped()) 
+
+    if(button_now < button_before)
+    {
+        START = 1;
+        IR_lock = 1;
+    }
+    else START = 0;
+    button_before = button_now;
+
+
+    if(Remote.isStopped() && !IR_lock) 
     {
         state = 0;
         Move.stop();
         LEDRed.blink(500);
     }
+
 
     //=========================Writeing value from sensors to variables=============
 
@@ -204,10 +217,10 @@ Serial.println(QREright);
     {
     case 000:       // INIT
         
-        if(bootonOld < digitalRead(button)) state = 003;
+        //if(bootonOld < digitalRead(button)) state = 003;
 
         
-        if (Remote.hasDohyoID() && !Remote.isStarted())
+        if ((Remote.hasDohyoID() && !Remote.isStarted()) || START)
         {
             LEDRed.blink(500, 100);
 
@@ -221,8 +234,9 @@ Serial.println(QREright);
         }
 
         // after start comand, main code will start running
-        if (Remote.isStarted()/* || START*/)
+        if (Remote.isStarted() || START)
         {
+            delay(5000);
             //UDP_SendUdpToAll("======================", 1);
             state = 002;
             Tick_Start.tickNumber = 0;
@@ -328,7 +342,7 @@ Serial.println(QREright);
         }      
         break;
 
-    case 003:
+    /*case 003:
  
         LINEstate = 0;
         LEDRed.setOff();
@@ -359,7 +373,7 @@ Serial.println(QREright);
             count = 0;
             state = 000;
         }
-        break;
+        break;*/
 
     /*=============END OF START FUNCTION=============*/
 

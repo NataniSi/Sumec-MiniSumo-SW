@@ -12,9 +12,9 @@
 
 // QRE sensor pins
 
-#define PIN_QRE_LEFT            6
-#define PIN_QRE_RIGHT           7
-#define PIN_QRE_REAR            8
+//#define PIN_QRE_LEFT            6
+//#define PIN_QRE_RIGHT           7
+//#define PIN_QRE_REAR            8
 
 // side Sharp sensor pins
 
@@ -32,4 +32,5 @@
 #define S_module                37              
 // BUTTON   
 
-#define button                  2
+#define button04                  4
+#define bzucak                  2

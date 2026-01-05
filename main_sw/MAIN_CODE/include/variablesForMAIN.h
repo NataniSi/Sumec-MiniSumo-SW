@@ -23,6 +23,8 @@ bool sharpON_OFF = 1;           // rafinering parameter for side sonzors, Is sid
 bool lunaON_OFF = 1;            // rafinering parameter for Length senzor, Is Length senzor on or off
 bool QRE_left_started = 0;
 int START = 0; 
+bool button_before = 0;
+bool IR_lock = 0;
 
 
 // sensors:
