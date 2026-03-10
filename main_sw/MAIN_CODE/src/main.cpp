@@ -109,14 +109,14 @@ void loop()
     QREright = qreRight.get();
     QREback = qreBack.get();
 
+
     // Length senzors
-    /*
-    pwmL.pwmRead(&pulseL);
+   /*pwmL.pwmRead(&pulseL);
     pwmR.pwmRead(&pulseR);
     LUNAleft = round(pwmL.pwmToMm(pulseL)/10);
     LUNAright = round(pwmR.pwmToMm(pulseR)/10);
-    LUNAmiddle = TfL_Get(TfL_Addr2);
-    */
+    LUNAmiddle = TfL_Get(TfL_Addr2);*/
+    
 
 
 
@@ -196,20 +196,16 @@ void loop()
  
     /*** FOR TEST PROGRAM ***/
 
-    /*Serial.print(LUNAleft);
+    Serial.print(SHARPleft);
     Serial.print(" ");
     Serial.print(LUNAmiddle);
     Serial.print(" ");
-    Serial.print(LUNAright);
+    Serial.print(SHARPright);
     Serial.print("    ");
-    Serial.println(state);*/
+    Serial.print(QREleft);
+    Serial.print("  ");
+    Serial.println(QREright);
 
-    //Serial.println(LUNAmiddle);
-/*
-Serial.print(QREleft);
-Serial.print("    ");
-Serial.println(QREright);
-*/
 
 
 

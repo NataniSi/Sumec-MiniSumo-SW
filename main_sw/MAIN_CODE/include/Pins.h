@@ -32,5 +32,5 @@
 #define S_module                37              
 // BUTTON   
 
-#define button04                  4
+#define button04                4
 #define bzucak                  2
