@@ -196,10 +196,14 @@ void loop()
         
         if(bootonOld < digitalRead(button)) //state = 003;
         {
-            back_on_line = (back_on_line+1)%2;
+            /*back_on_line = (back_on_line+1)%2;
 
             if(back_on_line) LEDOrange.setOn();
-            else LEDOrange.setOff();
+            else LEDOrange.setOff();*/
+
+            delay(5000);
+            state = 002;
+            LEDRed.blink(500, 100);
         }
         
         //===========================Checking IR state===============================
@@ -213,7 +217,9 @@ void loop()
         {
             LEDRed.blink(500);
 
-            if(SHARPleft)
+            //!!!  POKUD BUDOU SHARPY NAMONTOVANY TAK ODKOMENTOVAT !!!
+            
+            /*if(SHARPleft)
             { 
                 starting_direction = 0;
                 LEDOrange.setOff();
@@ -222,7 +228,7 @@ void loop()
             {
                 LEDOrange.blink(500, 100);
                 starting_direction = 1;
-            }
+            }*/
         }
 
         // after start comand, main code will start running
