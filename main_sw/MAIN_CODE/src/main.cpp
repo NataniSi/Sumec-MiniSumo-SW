@@ -70,7 +70,7 @@ void loop()
     START = digitalRead(PIN_Start);
 
     
-    if(Remote.isStopped()) 
+    if(Remote.isStopped() && butonStart) 
     {
         state = 0;
         Move.stop();
@@ -94,8 +94,8 @@ void loop()
 
 
     // side sonzors
-    SHARPleft = sharpLeft.get();
-    SHARPright = sharpRight.get();
+    SHARPright = sharpLeft.get();
+    SHARPleft = sharpRight.get();
 
     // Writeing value to TICK
     Tick_managing(Tick_QRE.tickTime, Tick_QRE.tickNumber, Tick_QRE.lastTick, &Tick_QRE.lastTick, &Tick_QRE.tickNumber);
@@ -172,20 +172,20 @@ void loop()
     // printing values from senzors to chack, is it ok
     if(tests)
     {    
-        /*Serial.print(LUNAleft);
+        Serial.print(LUNAleft);
         Serial.print(" ");
         Serial.print(LUNAmiddle);
         Serial.print(" ");
-        Serial.println(LUNAright);
+        Serial.print(LUNAright);
         Serial.print("    ");
         Serial.print(QREright);
         Serial.print(" ");
-        Serial.println(QREleft);*/
+        Serial.print(QREleft);
         Serial.print(SHARPleft);
         Serial.print(" ");
-        Serial.println(SHARPright);
-        //Serial.println("    ");
-        //Serial.print(state);
+        Serial.print(SHARPright);
+        Serial.print("    ");
+        Serial.println(state);
     
     }
     //Serial.println(starting_direction);
@@ -204,6 +204,7 @@ void loop()
             delay(5000);
             state = 002;
             LEDRed.blink(500, 100);
+            butonStart = 0;
         }
         
         //===========================Checking IR state===============================

@@ -19,6 +19,7 @@ uint16_t state = 0;             // variable who decides, what is in progress
 uint16_t LINEstate = 0;
 uint8_t startState;
 uint16_t saveState;
+bool butonStart = 1;
 
 // Start variables
 bool isStarted = 0;             // variable for starting with button
