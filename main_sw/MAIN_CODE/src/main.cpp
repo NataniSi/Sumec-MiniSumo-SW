@@ -63,6 +63,7 @@ void setup()
     // hardware settings (Setup's):
     TfL_Setup(5);
     pinMode(button04, INPUT_PULLUP);
+    pinMode(button05, INPUT_PULLUP);
     pinMode(6, OUTPUT);
     pinMode(18, OUTPUT);
     pinMode(S_module, INPUT);
@@ -82,8 +83,10 @@ void loop()
     LEDOrange.update();         //updates the orange led
     Remote.update();
     bool button_now = digitalRead(button04);
+    bool button05_now = digitalRead(button05);
 
 
+    // starting button
     if(button_now < button_before)
     {
         START = 1;
@@ -92,6 +95,16 @@ void loop()
     else START = 0;
     button_before = button_now;
 
+
+    // calibration button
+    if(button05_now < button05_before && !IR_lock)
+    {
+        state = 3;
+        IR_lock = 1;
+        LEDRed.setOn();
+        LEDOrange.setOn();
+        LINEstate = 5;
+    }
 
     if(Remote.isStopped() && !IR_lock) 
     {
@@ -187,7 +200,9 @@ void loop()
 
             //UDP_SendUdpToAll("QRE_END", 1);
             break;
-
+        case 5:
+            /*idle*/
+            break;
     }
 
     
@@ -196,15 +211,15 @@ void loop()
  
     /*** FOR TEST PROGRAM ***/
 
-    Serial.print(SHARPleft);
+    /*Serial.print(SHARPleft);
     Serial.print(" ");
     Serial.print(LUNAmiddle);
     Serial.print(" ");
     Serial.print(SHARPright);
     Serial.print("    ");
-    Serial.print(QREleft);
+    Serial.print(qreLeft.get());
     Serial.print("  ");
-    Serial.println(QREright);
+    Serial.println(qreRight.get());*/
 
 
 
@@ -338,38 +353,44 @@ void loop()
         }      
         break;
 
-    /*case 003:
+    case 003:
  
-        LINEstate = 0;
-        LEDRed.setOff();
+        static int L_min;
+        static int L_max;
+        static int R_min;
+        static int R_max;
+        static int page = 0;
 
-        if(digitalRead(button) && count == 0)
+        if(button05_now < button05_before && page == 1)
         {
-            B = 0;
-            A = analogRead(10);
-            Serial.print("A: ");
-            Serial.println(A);
-            count = 1;
+            L_min = qreLeft.getRaw();
+            R_min = qreRight.getRaw();
+
+            qreLeft.Threshold = L_min + ((L_max - L_min)/2);
+            qreRight.Threshold = R_min + ((R_max - R_min)/2);
+            LEDOrange.setOff();
+            LEDRed.setOff();
+            state = 0;
+            IR_lock = 0;
+            LINEstate = 0;
+            page = 0;
+
+            Serial.print("L_treshold: ");
+            Serial.println(qreLeft.Threshold);
+            Serial.print("R_treshold: ");
+            Serial.println(qreRight.Threshold);
         }
-        else if(count == 1 && !digitalRead(button))
+
+        if(button05_now < button05_before && page == 0 && state == 3)
         {
-            count = 2;
+            L_max = qreLeft.getRaw();
+            R_max = qreRight.getRaw();
+            LEDOrange.blink(300);
+            LEDRed.blink(300);
+            page = 1;
         }
-        else if(digitalRead(button) && count ==2)
-        {
-            B = analogRead(10);
-            Serial.print("B: ");
-            Serial.println(B);
-            count = 3;
-        }
-        else if(count == 3 && !digitalRead(button))
-        {
-            Serial.println(calibration(A, B));
-            
-            count = 0;
-            state = 000;
-        }
-        break;*/
+
+        break;
 
     /*=============END OF START FUNCTION=============*/
 
@@ -502,5 +523,6 @@ void loop()
         Tick_free.tickNumber = 0;        
         
         break;
-    }    
+    }   
+    button05_before = button05_now; 
 }

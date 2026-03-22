@@ -24,7 +24,7 @@
 // LED pins
 
 #define PIN_LED_RED             36
-#define PIN_LED_ORABGE          48
+#define PIN_LED_ORABGE          44
 
 // IR sensor pin
 
@@ -33,4 +33,5 @@
 // BUTTON   
 
 #define button04                4
+#define button05                5
 #define bzucak                  2

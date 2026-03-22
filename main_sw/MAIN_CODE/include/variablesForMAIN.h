@@ -24,6 +24,7 @@ bool lunaON_OFF = 1;            // rafinering parameter for Length senzor, Is Le
 bool QRE_left_started = 0;
 int START = 0; 
 bool button_before = 0;
+bool button05_before = 0;
 bool IR_lock = 0;
 
 
