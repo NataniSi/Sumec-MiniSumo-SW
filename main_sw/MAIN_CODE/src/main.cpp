@@ -73,7 +73,8 @@ void setup()
     pwmL.pwmSetup();
     pwmR.pwmSetup();
 
-    qreLeft.Threshold = 1800;
+    //Treshold settings
+    qreLeft.Threshold = 750;
     qreRight.Threshold = 1800;
 }
 
@@ -247,7 +248,7 @@ void loop()
         // after start comand, main code will start running
         if (Remote.isStarted() || START)
         {
-            delay(5000);
+            if(IR_lock) delay(5000);
             //UDP_SendUdpToAll("======================", 1);
             state = 002;
             Tick_Start.tickNumber = 0;
@@ -342,7 +343,7 @@ void loop()
             
             if(!SHARPright)
             {
-                Move.turnRight(0.4);
+                Move.turnRight(0.9);
             } else {
 
                 state = 290;
@@ -396,8 +397,8 @@ void loop()
 
     case 230:                                                                           // Turn Right 
 
-        Move.turnRight(0.3);
-        //digitalWrite(6, 1);
+        Move.turnRight(0.7);
+
         
         /*if(LUNAleft < Range && LUNAmiddle > Range)
         {
@@ -441,7 +442,7 @@ void loop()
         break;
     case 231:
 
-        Move.turnRight(0.6, 0.2);
+        Move.turnRight(1.0, 0.6);
 
         if(LUNAright > Range && (LUNAleft < Range || LUNAmiddle < Range)) 
         {   
@@ -461,7 +462,7 @@ void loop()
         break;
     case 260:                                                                           // Turn Left
 
-        Move.turnLeft(0.6, 0.2);
+        Move.turnLeft(1.0, 0.6);
 
         if(LUNAleft > Range && (LUNAright < Range || LUNAmiddle < Range)) 
         {   
@@ -485,7 +486,7 @@ void loop()
     case 290:                                                                           // Go Forward
 
 
-        if(Tick_free.tickNumber < 30)
+        if(Tick_free.tickNumber < 5)
         {
             Move.goForward(1.0);
         }
@@ -507,7 +508,7 @@ void loop()
 
         if(LUNAmiddle < Range) state = 290;
 
-        Move.turnLeft(0.6, 0.9);
+        Move.turnLeft(0.6, 0.7);
         Tick_free.lastTick = millis();
         Tick_free.tickNumber = 0;       
 
@@ -518,7 +519,7 @@ void loop()
 
         if(LUNAmiddle < Range) state = 290;
 
-        Move.turnRight(0.6, 0.9);
+        Move.turnRight(0.6, 0.7);
         Tick_free.lastTick = millis();
         Tick_free.tickNumber = 0;        
         
