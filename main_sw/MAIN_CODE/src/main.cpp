@@ -343,7 +343,7 @@ void loop()
             
             if(!SHARPright)
             {
-                Move.turnRight(0.9);
+                Move.turnRight(1.0);
             } else {
 
                 state = 290;
@@ -397,7 +397,7 @@ void loop()
 
     case 230:                                                                           // Turn Right 
 
-        Move.turnRight(0.7);
+        Move.turnRight(1.0);
 
         
         /*if(LUNAleft < Range && LUNAmiddle > Range)
